@@ -1,10 +1,12 @@
 # Putoshka x Rutube (Генерация виральных клипов)
+Описание проекта:
+
+Стек:
 
 ## [Screencast]()
 ## [Website]()
 
 ## Команда
-
 
   Александр Ергучев (Backend)
   
@@ -24,9 +26,6 @@
 
 # Архитектура
 ## Frontend (React)
-### npm start
-
-### npm run build
 
 ## Backend (FastAPI)
 
