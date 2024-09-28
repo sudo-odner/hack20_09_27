@@ -8,6 +8,7 @@ from fastapi import FastAPI, UploadFile
 from analysis import text_analysis, audio_analysis, video_analysis, get_timecodes
 from covert import STT, SentimentAnalysis
 from generate import generate_tags
+from generateNameAndDisc import generate_text_data
 
 app = FastAPI()
 stt = STT("base")
@@ -48,9 +49,10 @@ def get_text(_id: str):
     return {"status": status, "data": wordData}
 
 
-@app.post("/tag_text")
-def get_text(text: str):
-    return {"status": True, "text": generate_tags(text)}
+@app.post("/info_fragments")
+def info_fragments(text: str):
+    title, about = generate_text_data(text, num_keywords=1, num_sentences=3)
+    return {"status": True, "tags": generate_tags(text), "title": title, "about": about}
 
 
 @app.get("/video/{_id}/fragments")

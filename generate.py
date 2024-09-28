@@ -38,3 +38,4 @@ def generate_tags(text):
     tags = set(tags)
 
     return list(tags)
+
