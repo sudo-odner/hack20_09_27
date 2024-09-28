@@ -77,10 +77,11 @@ class App(FastAPI):
         return JSONResponse({"cover": await video_tools.bytes2img(cover), "title": title, "duration": duration})
 
     async def get_clip(self, clip_id: int):
-        clip = await queries.get_clip(clip_id)
+        clip, project_id = await queries.get_clip(clip_id)
 
-        with open(f"storage/{clip.project_id}/clips/{clip.id}.mp4", "rb") as f:
+        with open(f"storage/{project_id}/clips/{clip.id}.mp4", "rb") as f:
             video = f.read()
+        video = await video_tools.bytes2img(video)
 
         return JSONResponse({"video": video, "subtitles": clip.subtitles, "tags": clip.tags, "start": clip.start, "end": clip.end, "subtitle": clip.subtitle, "adhd": clip.adhd})
 

@@ -75,7 +75,7 @@ async def get_clip_details(clip_id):
 
 async def get_clip(clip_id):
     async with async_session() as session:
-        q = select(Clip).where(
+        q = select(Clip, Clip.project_id).where(
             Clip.id == clip_id)
         result = await session.execute(q)
         clip = result.one()
