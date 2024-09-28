@@ -103,7 +103,12 @@ function Project() {
           <h3>{data.title}</h3>
           <VideoEditor />
         </div>
-      </div>,
+      </div>, 
+      <div className="settings">
+          <h1>Название клипа</h1>
+          <h3>Описание:</h3>
+          <p className="clip-description">Механизм использования лимита внутридневного кредита в период работы СБП в ночное время, в выходные и праздничные дни разработан и предоставляется банкам-участникам СБП для обеспечения непрерывной работы Системы быстрых платежей.
+          </p>
       <div className="subtitles">
         {subtitles.map((v, i) => {
           return activated !== i ? (
@@ -128,7 +133,7 @@ function Project() {
             </div>
           );
         })}
-      </div>] :  <div className="editor" style={{margin:"auto"}}><h3>Выберите клип</h3></div>}
+      </div></div>] :  <div className="editor" style={{margin:"auto"}}><h3>Выберите клип</h3></div>}
     </div>
   );
 }
