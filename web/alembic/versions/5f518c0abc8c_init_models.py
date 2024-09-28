@@ -25,6 +25,7 @@ def upgrade() -> None:
                     sa.Column('name', sa.String(), nullable=False),
                     sa.Column('cover', sa.LargeBinary(), nullable=True),
                     sa.Column('datetime', sa.DateTime(), nullable=False),
+                    sa.Column('token_model', sa.String(), nullable=True),
                     sa.PrimaryKeyConstraint('id')
                     )
     op.create_table('user',

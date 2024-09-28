@@ -1,4 +1,5 @@
 import video_tools
+import model
 from db_tools import queries
 from fastapi.responses import JSONResponse, FileResponse
 from fastapi.middleware.cors import CORSMiddleware
@@ -57,14 +58,42 @@ class App(FastAPI):
             f.write(content)
 
         cover = await video_tools.get_cover(f"storage/{project_id}/{filename}")
-        await queries.set_cover_project(project_id, cover)
+        token_model = await model.get_token(f"storage/{project_id}/{filename}")
+        await queries.set_cover_token_project(project_id, cover, token_model)
+
+        subtitles = await model.get_text(token_model)
+        fragments = await model.get_fragments(token_model)
 
         os.makedirs(f"storage/{project_id}/clips", exist_ok=True)
         duration = await video_tools.get_duration(f"storage/{project_id}/{filename}")
-        clip_id = await queries.create_clip(project_id, filename, duration, cover)
+        clip_id = await queries.create_clip(project_id, filename, duration, cover, json.dumps(subtitles))
 
         shutil.copy2(f"storage/{project_id}/{filename}",
                      f"storage/{project_id}/clips/{clip_id}.mp4")
+
+        for fragment in fragments:
+            l = -1
+            r = len(subtitles) - 1
+            while r - l > 1:
+                mid = l + (r - l) // 2
+                if fragment["startTime"] >= subtitles[mid]["endTime"]:
+                    l = mid
+                else:
+                    r = mid
+            s = r
+            l = 0
+            r = len(subtitles)
+            while r - l > 1:
+                mid = l + (r - l) // 2
+                if fragment["endTime"] >= subtitles[mid]["startTime"]:
+                    l = mid
+                else:
+                    r = mid
+
+            subtitles_ = subtitles[s:l + 1]
+
+            clip_id = await queries.create_clip(project_id, filename, duration, cover, json.dumps(subtitles_), fragment["startTime"], fragment["endTime"])
+            await video_tools.cut_video_by_timestamps(f"storage/{project_id}/{filename}", [fragment], f"storage/{project_id}/clips/{clip_id}.mp4", subtitles_)
 
         return JSONResponse({"project_id": project_id}, 201)
 

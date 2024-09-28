@@ -45,12 +45,13 @@ async def create_project(ip_address, name):
         return project_id
 
 
-async def set_cover_project(project_id, cover):
+async def set_cover_token_project(project_id, cover, token_model):
     async with async_session() as session:
         q = select(Project).where(Project.id == project_id)
         result = await session.execute(q)
         project = result.scalar()
         project.cover = cover
+        project.token_model = token_model
         await session.commit()
 
 
