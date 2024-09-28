@@ -77,10 +77,10 @@ class STT:
         _id = self.saveData(text, word_data)
         return _id
 
-    def convertMP4(self, pahtToMP4: str) -> str:
+    def convertMP4(self, pathToMP4: str) -> str:
         absPath = os.path.abspath("")
         pathTempMP3 = f"{absPath}/temp/mp3"
-        fileName = os.path.splitext(os.path.basename(pahtToMP4))[0]
+        fileName = os.path.splitext(os.path.basename(pathToMP4))[0]
         tempFilePath = f"{pathTempMP3}/{fileName}.mp3"
 
         # Setting temp directory
@@ -88,7 +88,7 @@ class STT:
             os.makedirs(pathTempMP3)
 
         # Convert MP4 to MP3
-        video = VideoFileClip(pahtToMP4)
+        video = VideoFileClip(pathToMP4)
         video.audio.write_audiofile(tempFilePath, logger=None)
 
         # Convert MP3 to data text
