@@ -7,6 +7,7 @@ import Clear from "../../icons/Close.svg";
 import "./index.scss";
 import Clip from "../../components/Clip";
 import VideoEditor from "../../components/VideoEditor";
+import JSZip from "jszip"
 
 function Project() {
     const [searchProp, setSearchProp] = useState("");
@@ -90,11 +91,20 @@ function Project() {
 
               if (response.ok) {
                   console.log('Success:', response.status);
-                  console.log(response.text())
-                  let text = await response.text();
-                  const data = JSON.parse(text);
+                  // console.log(response.text())
+                  let blob = await response.blob();
+
+                  var new_zip = new JSZip();
+                  new_zip.loadAsync(blob).then(async function(zipped) {
+                    let res = await zipped.file('video.mp4').async("blob")
+                    let details = await JSON.parse(await zipped.file('data.json').async("string"))
+                    console.log(zipped, details)
+                    setData({"file": res, "title": "Название клипа", subtitles: [], tags: ""})
+                  })
+
+                  // const data = JSON.parse(text);
                   console.log(data)
-                  setData(data);
+                  // setData(data);
 
               } else {
                   console.error(response.statusText);
@@ -121,7 +131,7 @@ function Project() {
                         Все проекты
                     </div>
                 </div>
-                <div className="search">
+                {/* <div className="search">
                     <div className="srchBrWrapper">
                         <img src={SearchIcon} alt="" />
                         <input
@@ -131,7 +141,7 @@ function Project() {
                                 setSearchProp(e.target.value);
                             }}
                         />
-                        {/* <img src={Settings} className="c" alt="" onClick={()=>{setSettings(!settings)}}/> */}
+                        {/* <img src={Settings} className="c" alt="" onClick={()=>{setSettings(!settings)}}/> 
                         {searchProp ? (
                             <img
                                 alt=""
@@ -145,7 +155,7 @@ function Project() {
                             ""
                         )}
                     </div>
-                </div>
+                </div> */}
                 <div className="clips">
                     {clips.map((v) => (
                         <Clip clip_id={v} chooseClip={chooseClip} chosenClip={chosenClip} />
@@ -155,22 +165,23 @@ function Project() {
 
       {data ? [<div className="editor">
         <div className="videoeditor">
-          <h3>{data.title}</h3>
-          <VideoEditor file={data.video}/>
+          {/* <h3>{data.title}</h3> */}
+          <VideoEditor file={data.file}/>
         </div>
       </div>, 
       <div className="settings">
-          <h1>Название клипа</h1>
+          <h1>{data.title}</h1>
           <h3>Описание:</h3>
-          <p className="clip-description">Механизм использования лимита внутридневного кредита в период работы СБП в ночное время, в выходные и праздничные дни разработан и предоставляется банкам-участникам СБП для обеспечения непрерывной работы Системы быстрых платежей.
+          <p className="clip-description">
+            {data.meta}
           </p>
       <div className="subtitles">
-        {subtitles.map((v, i) => {
+        {data.subtitles.map((v, i) => {
           return activated !== i ? (
             <div className="input">
-              00:01-00:10
+              {v.time}
               <input
-                value={v}
+                value={v.text}
                 onClick={() => {
                   setActivated(i);
                 }}
@@ -178,9 +189,9 @@ function Project() {
             </div>
           ) : (
             <div className="input">
-              00:01-00:10
+              {v.time}
               <input
-                placeholder={v}
+                placeholder={v.text}
                 onChange={(e) => {
                   updateSub(e.target.value, i);
                 }}

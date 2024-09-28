@@ -22,7 +22,8 @@
     }
 }
 
-.clip:hover {
+.clip:hover,
+.homeproject:hover {
     border: 1px solid $input-active;
 }
 

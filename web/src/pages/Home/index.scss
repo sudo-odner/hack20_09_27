@@ -29,6 +29,10 @@
                 background: $bright;
                 font-weight: 400;
             }
+            .createbutton-wrapper:hover {
+                background: $bright-hover;
+                box-shadow: 0px 1px 4px $bright;
+            }
         }
     }
 }

@@ -15,6 +15,9 @@ function HomeProject({ project_id = 0, img = "", title = "", date = "" }) {
     const to = useNavigate()
 
     const load_project_data = (id) => {
+
+        date = Intl.DateTimeFormat('en-US', {year: 'numeric', month: '2-digit',day: '2-digit'} ).format(Date.parse(date))
+
         return {
             project_id: project_id,
             img: `data:image/jpeg;base64,${img}`,

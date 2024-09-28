@@ -3,10 +3,12 @@
     // padding-top: 15vh;
     width: 100%;
     display: flex;
+    flex-direction: column;
     justify-content: space-evenly;
     min-height: 100vh;
+    align-items: center;
     .create-wrapper {
-        height: 100%;
+        // height: 100%;
         width: 90vw;
         display: flex;
         flex-direction: column;
@@ -22,18 +24,22 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            // input {
-            //     width: 100%;
-            //     margin: 1em 0;
-            //     padding: 0.5em 1em;
-            // }
+            input {
+                width: calc(100% - 2em);
+                margin: 1em 0;
+                padding: 0.5em 1em;
+            }
             .uploaded,
             .uploadbutton {
                 display: flex;
                 flex-direction: column;
                 align-items: center;
-                // height: 50vh;
+                justify-content: center;
+                min-height: 30vh;
+                border-radius: $border-radius-2;
                 // max-height: 40vh;
+                width: 100%;
+                cursor: pointer;
                 .videocover {
                     width: 95%;
                     // max-height: 40vh;
@@ -45,10 +51,13 @@
                     }
                 }
             }
+            .uploadbutton:hover {
+                background: $input-hover;
+            }
             .createbutton {
                 cursor: pointer;
                 width: 100%;
-                margin-top: 1em;
+                margin: 1em 0;
                 .createbutton-wrapper {
                     padding: 0.7em 1em;
                     border-radius: $border-radius-2;
@@ -56,6 +65,13 @@
                     background: $bright;
                     font-weight: bold;
                 }
+                .createbutton-wrapper:hover {
+                    background: $bright-hover;
+                    box-shadow: 0px 1px 4px $bright;
+                }
+            }
+            .uploadbutton {
+                border: 1px dashed $input-active;
             }
         }
     }

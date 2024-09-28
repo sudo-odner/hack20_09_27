@@ -3,14 +3,15 @@
     display: flex;
     cursor: pointer;
     flex-direction: column;
-    margin: 0.5em 1em;
+    padding: 0.5em 1em;
+    border-radius: $border-radius-2;
     .homeproject-cover {
         overflow: hidden;
-        border-radius: $border-radius-3;
-        width: 120px;
-        height: 120px;
         .homeproject-cover-img {
-            width: 100%
+            object-fit: cover;
+            width: 120px;
+            height: 120px;
+            border-radius: $border-radius-3;
         }
     }
     .homeproject-details {
