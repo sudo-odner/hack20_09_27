@@ -40,6 +40,14 @@ async def upload_video_mp4(file: UploadFile):
     return {"status": True, "id": new_id}
 
 
+@app.get("/video/{_id}/text")
+def get_text(_id: str):
+    print("Start create text video")
+    _, wordData, status = stt.loadData(_id)
+    print("End create fragments video: ", wordData, status)
+    return {"status": status, "data": wordData}
+
+
 @app.post("/tag_text")
 def get_text(text: str):
     return {"status": True, "text": generate_tags(text)}
@@ -79,7 +87,6 @@ def get_fragment(_id: str):
         answer_dict.append({
             "startTime": data[0][0],
             "endTime": data[0][1],
-            "tag": generate_tags(text)
         })
     print("timeMerge: ", time.time() - timeMerge)
     print("time fragment: ", time.time() - startTime)
