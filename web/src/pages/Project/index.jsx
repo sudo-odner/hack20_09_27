@@ -6,6 +6,7 @@ import Settings from "../../icons/Settings.svg";
 import Clear from "../../icons/Close.svg";
 import "./index.scss";
 import Clip from "../../components/Clip";
+import {SwishSpinner} from  "react-spinners-kit";
 import VideoEditor from "../../components/VideoEditor";
 import JSZip from "jszip"
 
@@ -16,6 +17,7 @@ function Project() {
 
     const [chosenClip, chooseClip] = useState(-1);
     const [clip, setClip] = useState("")
+    const [load, setLoad]  = useState(false)
 
     function home() {
         to("/");
@@ -39,6 +41,10 @@ function Project() {
         "So let's go.",
         "And I'll start walking towards them.",
     ]);
+
+    const [start, setStart] = useState(0)
+    const [end, setEnd] = useState(null)
+    
 
     const { project_id } = useParams();
 
@@ -100,13 +106,15 @@ function Project() {
                     let details = await JSON.parse(await zipped.file('data.json').async("string"))
                     console.log(zipped, details)
                     setData({"file": res, "title": "Название клипа", subtitles: [], tags: ""})
+                    setLoad(false)
                   })
 
                   // const data = JSON.parse(text);
                   console.log(data)
                   // setData(data);
-
               } else {
+                  chooseClip(-1)
+                  setLoad(false)
                   console.error(response.statusText);
               }
           } catch (error) {
@@ -115,7 +123,7 @@ function Project() {
       };
 
 
-        if (chosenClip !== -1) { loadVideo() } else { setData("") }
+    if (chosenClip !== -1) {loadVideo()} else { setData("") }
     }, [chosenClip]);
 
     return (
@@ -158,15 +166,15 @@ function Project() {
                 </div> */}
                 <div className="clips">
                     {clips.map((v) => (
-                        <Clip clip_id={v} chooseClip={chooseClip} chosenClip={chosenClip} />
+                        <Clip setLoad={setLoad} clip_id={v} chooseClip={chooseClip} chosenClip={chosenClip} />
                     ))}
                 </div>
             </div>
 
-      {data ? [<div className="editor">
+      {load ? <div className="editor" style={{margin:"auto"}}><h3>Загружаем клип..</h3><SwishSpinner frontColor="#12cced" backColor="#ED143B"/></div>  : (data ? [<div className="editor">
         <div className="videoeditor">
           {/* <h3>{data.title}</h3> */}
-          <VideoEditor file={data.file}/>
+          <VideoEditor start={start} end={end} setStart={setStart} setEnd={setEnd} file={data.file}/>
         </div>
       </div>, 
       <div className="settings">
@@ -187,7 +195,7 @@ function Project() {
                 }}
               />
             </div>
-          ) : (
+          ) :  (
             <div className="input">
               {v.time}
               <input
@@ -199,7 +207,7 @@ function Project() {
             </div>
           );
         })}
-      </div></div>] :  <div className="editor" style={{margin:"auto"}}><h3>Выберите клип</h3></div>}
+      </div></div>]: <div className="editor" style={{margin:"auto"}}><h3>Выберите клип</h3></div>)}
     </div>
   );
 }

@@ -13,7 +13,12 @@ class VideoEditor extends React.Component {
             isUpload: false,
             videoUrl: window.URL.createObjectURL(props.file),
             isDarkMode: true,
-            timings: []
+            timings: [],
+            start: props.start,
+            end: props.start,
+            setStart: props.setStart,
+            setEnd: props.setEnd
+            
         }
     }
 

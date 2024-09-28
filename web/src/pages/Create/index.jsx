@@ -3,7 +3,7 @@ import "./index.scss";
 import { useNavigate } from "react-router-dom";
 // import server_url from "../../site";
 import FileUI from "../../components/FileUI";
-import {MetroSpinner, TraceSpinner, BarsSpinner, PongSpinner} from "react-spinners-kit";
+import { PongSpinner } from "react-spinners-kit";
 
 function Create({ setCookie, setCookieR }) {
     const to = useNavigate();

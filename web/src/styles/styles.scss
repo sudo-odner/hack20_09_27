@@ -37,13 +37,20 @@ a {
     text-decoration: none;
 }
 
-input {
+input,
+select {
     border: 1px solid $input-active;
     color: white;
+    background: $main-bg;
     font-weight: 300;
 }
 
-input:focus {
+select {
+    -webkit-appearance: none;
+}
+
+input:focus,
+select:focus {
     // border: 1px solid $input-inactive;
     border: 1px solid $main-bg;
     box-shadow: none;

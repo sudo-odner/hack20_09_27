@@ -5,6 +5,7 @@
     font-size: large;
 }
 
+@import "../../styles/variables.scss";
 .file-drop>.file-drop-target {
     transition: border-color .3s ease;
     border: 0.2em solid #f04e26;
@@ -297,4 +298,32 @@
 
 .marginVertical {
     margin: 1.5em 0em;
+}
+
+select,
+option {
+    padding: 0.7em 1em;
+    margin: 1em 0;
+    font-size: large;
+}
+
+button {
+    -webkit-appearance: none;
+}
+
+.savebutton {
+    cursor: pointer;
+    width: 100%;
+    margin: 1em 0;
+    .savebutton-wrapper {
+        padding: 0.7em 1em;
+        border-radius: $border-radius-2;
+        text-align: center;
+        background: $bright;
+        font-weight: bold;
+    }
+    .savebutton-wrapper:hover {
+        background: $bright-hover;
+        box-shadow: 0px 1px 4px $bright;
+    }
 }

@@ -3,7 +3,7 @@ import "./index.scss";
 import { useNavigate } from "react-router-dom";
 import server_url from "../../site";
 
-function Clip({ clip_id = 0, chooseClip, chosenClip}) {
+function Clip({ clip_id = 0, chooseClip, chosenClip, setLoad}) {
   const [clipData, setClipData] = useState({
     clip_id: "",
     cover: "",
@@ -44,7 +44,7 @@ function Clip({ clip_id = 0, chooseClip, chosenClip}) {
   }, [clip_id]);
 
   return (
-    <div className={"clip" + (chosenClip===clip_id ? " chosen" : "")} onClick={()=>{chooseClip(clip_id)}}>
+    <div className={"clip" + (chosenClip===clip_id ? " chosen" : "")} onClick={()=>{setLoad(true);chooseClip(clip_id)}}>
       <div className="clip-cover">
         <img
           className="clip-cover-img"
