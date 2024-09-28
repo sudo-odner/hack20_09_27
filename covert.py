@@ -5,7 +5,7 @@ import uuid  # For generate id to user video data
 import pickle  # Save user video data on file
 import os  # Work with file
 import numpy as np  # Fast work with array
-from transformers import pipeline  # Get open-source model
+from transformers import pipeline, AutoTokenizer, BertForSequenceClassification  # Get open-source model
 
 
 class STT:
@@ -133,3 +133,38 @@ class SentimentAnalysis:
             wordData[idx]["sentiment_analysis"] = dataScope[idx]
 
         return wordData[lenWords:(len(wordData) - lenWords)]
+
+
+class EmotionAnalysis:
+    def __init__(self):
+        self._labels = ['neutral', 'happiness', 'sadness', 'enthusiasm', 'fear', 'anger', 'disgust']
+        self.tokenizer = AutoTokenizer.from_pretrained('Aniemore/rubert-tiny2-russian-emotion-detection')
+        self.model = BertForSequenceClassification.from_pretrained('Aniemore/rubert-tiny2-russian-emotion-detection')
+
+    @torch.no_grad()
+    def _analysis(self, text: str):
+        inputs = self.tokenizer(text, max_length=512, padding=True, truncation=True, return_tensors='pt')
+        outputs = self.model(**inputs)
+        predicted = torch.nn.functional.softmax(outputs.logits, dim=1)
+
+        predicted = torch.argmax(predicted, dim=1).numpy()
+        return predicted
+
+    def analysisWordData(self, wordDataFragments: list[dict]) -> list[dict]:
+        text = ""
+        for word in wordDataFragments:
+            text = "".join(text, word["text"])
+
+        textSentiments: list[str] = list()
+        split_regex = re.compile(r'[.|!|?|…]')
+        sentences = filter(lambda t: t, [t.strip() for t in split_regex.split(text)])
+        for s in sentences:
+            textSentiments.append(s)
+
+        answer: list[dict] = list()
+        for text in textSentiments:
+            answer.appned({
+                "text": text,
+                "emootion": self._analysis(text)
+            })
+        return answer
