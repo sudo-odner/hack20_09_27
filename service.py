@@ -1,10 +1,11 @@
 import os
+import time
 import uuid
 import aiofiles
 import uvicorn
 from fastapi import FastAPI, UploadFile
 
-from analysis import text_analysis, audio_analysis, video_analysis, fragments
+from analysis import text_analysis, audio_analysis, video_analysis, get_timecodes
 from covert import STT, SentimentAnalysis
 
 app = FastAPI()
@@ -42,11 +43,13 @@ async def upload_video_mp4(file: UploadFile):
 def get_text(_id: str):
     print("Start create text video")
     _, wordData, status = stt.loadData(_id)
+    print("End create fragments video: ", wordData, status)
     return {"status": status, "data": wordData}
 
 
 @app.get("/video/{_id}/fragments")
 def get_fragment(_id: str):
+    startTime = time.time()
     print("Start create fragments video")
     absPath = os.path.abspath("")
     pathDict = f"{absPath}/user"
@@ -59,22 +62,29 @@ def get_fragment(_id: str):
     sa.sentimentWordData(word_data)
 
     # Create three data analiz text, audio, video
+    timeText = time.time()
     dataText = text_analysis(word_data)
+    print("timeText: ", time.time() - timeText)
+    timeAudio = time.time()
     dataAudio = audio_analysis(pathMP4)
+    print("timeAudio: ", time.time() - timeAudio)
+    timeVideo = time.time()
     dataVideo = video_analysis(pathMP4)
+    print("timeVideo: ", time.time() - timeVideo)
 
     # Merge data and get best timing
-    fragment = fragments(dataText, dataAudio, dataVideo)
+    timeMerge = time.time()
+    print("Start merge data")
+    fragment = get_timecodes(dataText, dataVideo, dataAudio, aud_c=1, compl_c=0.5, k=1, points_between_peaks=800, epsilon_to_cut=500)
     answer_dict = list()
     for data in fragment:
         answer_dict.append({
             "startTime": data[0][0],
             "endTime": data[0][1],
         })
-        
-    # Add emotion people(emoji)
-
-    print(fragment)
+    print("timeMerge: ", time.time() - timeMerge)
+    print("time fragment: ", time.time() - startTime)
+    print("End create fragments video: ", fragment, answer_dict)
     return {"status": True, "data": answer_dict}
 
 

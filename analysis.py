@@ -118,7 +118,7 @@ def video_analysis(video_path: str, take_every_n_frame=50, border_of_std=0.1) ->
     coef.sort(key=lambda x: x[0][0])
     return coef
 
-
+# Merge
 def min_max_norm(data):
     # Масштабирование Min-Max
     min_val = np.min(data)
@@ -150,29 +150,93 @@ def merge_sections(first_seq, second_seq, third_seq, weight_of_first_seq, weight
     for sec in range(len(third_seq)):
         a[time3[sec][0]:time3[sec][1]+1] += coef3[sec] * weight_of_third_seq
 
-    s, f = 0, 0
+    s, f = 0,0
     n = a[0]
     for ms in a:
-        if ms == n:
-            f += 1
+        if ms == n: f+=1
         else:
-            if f-s > 10 and n != 0: out.append([(s,f),float(n)])
-            n = ms
+            if f-s > 10 and n!=0: out.append([(s,f),float(n)])
+            n=ms
             s = f+1
             f = s
 
     return out
 
 
-def fragments(dataText: list[tuple[tuple[int, int], float]], dataAudio: list[tuple[tuple[int, int], float]], dataVido: list[tuple[tuple[int, int], float]], k=0.1, points_between_peaks=2) -> list[tuple[tuple[int, int], float]]:
-    out = merge_sections(dataText, dataVido, dataAudio, 15, 5, 25)
-    coefs = np.array([subarray[1] for subarray in out])
+def mult_and_merge_two_sections(main_seq, mult_seq, w_of_mult = 1):
+    out = []
 
-    out_indices = np.where(coefs > k*np.mean(coefs))[0]
+    time1 = [i[0] for i in main_seq]
+    coef1 = min_max_norm([i[1] for i in main_seq])
+
+    time2 = [i[0] for i in mult_seq]
+    coef2 = min_max_norm([i[1] for i in mult_seq])
+
+    a = np.ones(max(main_seq[-1][0][1],mult_seq[-1][0][1]))
+
+    for sec in range(len(main_seq)):
+        a[time1[sec][0]:time1[sec][1]+1] += coef1[sec]
+
+    for sec in range(len(mult_seq)):
+        a[time2[sec][0]:time2[sec][1]+1] *= coef2[sec] * w_of_mult
+
+    s, f = 0,0
+    n = a[0]
+    for ms in a:
+        if ms == n: f+=1
+        else:
+            if f-s > 0 and n!=0: out.append([(s,f),float(n)])
+            n=ms
+            s = f+1
+            f = s
+
+    return out
+
+
+def add_and_merge_two_sections(main_seq, add_seq, w_of_add = 1):
+    out = []
+
+    time1 = [i[0] for i in main_seq]
+    coef1 = min_max_norm([i[1] for i in main_seq])
+
+    time2 = [i[0] for i in add_seq]
+    coef2 = min_max_norm([i[1] for i in add_seq])
+
+    a = np.zeros(max(main_seq[-1][0][1],add_seq[-1][0][1]))
+
+    for sec in range(len(main_seq)):
+        a[time1[sec][0]:time1[sec][1]+1] += coef1[sec]
+
+    for sec in range(len(add_seq)):
+        a[time2[sec][0]:time2[sec][1]+1] += coef2[sec] * w_of_add
+
+    s, f = 0,0
+    n = a[0]
+    for ms in a:
+        if ms == n: f+=1
+        else:
+            if f-s > 0 and n!=0: out.append([(s,f),float(n)])
+            n=ms
+            s = f+1
+            f = s
+
+    return out
+
+
+def get_timecodes(semantic, compl_coef, audio_peaks, aud_c=2, compl_c=1, k=0.1, points_between_peaks=0.1, epsilon_to_cut=1000, shortDescription: bool=False):
+    out = mult_and_merge_two_sections(add_and_merge_two_sections(semantic, audio_peaks, aud_c), compl_coef,compl_c)
+    coefs = np.array([subarray[1] for subarray in out])
+    out_indices = np.where(coefs > np.mean(coefs)+np.std(coefs)*k)[0]
+
+    out_data_for_dist = []
+    for i in out_indices:
+        out_data_for_dist.append([(out[i][0][0]+out[i][0][1])/2, (1+coefs[i])**2])
 
     clusters = scipy.cluster.hierarchy.fcluster(
-        scipy.cluster.hierarchy.linkage(out_indices[:,None], method='single'),
+        scipy.cluster.hierarchy.linkage(out_data_for_dist, method='single'),
         t=points_between_peaks, criterion='distance')
+
+    print('Num of clusters =',len(set(clusters)))
 
     segments = []
     for cluster_id in set(clusters):
@@ -180,9 +244,30 @@ def fragments(dataText: list[tuple[tuple[int, int], float]], dataAudio: list[tup
         segment = 0
         for i in cluster_indices:
             segment += out[i][1]
-        len_of_sec = out[cluster_indices[-1]][0][1]-out[cluster_indices[0]][0][0]
-        if 10000 < len_of_sec < 3 * 60* 1000:
-            segments.append(((out[cluster_indices[0]][0][0], out[cluster_indices[-1]][0][1]), segment))
+        len_of_sec = out[cluster_indices[-1]][0][1]-out[cluster_indices[0]][0][0] + 2*epsilon_to_cut
+        if 10000 < len_of_sec < 3*60*1000:
+            segments.append([(abs(out[cluster_indices[0]][0][0] - epsilon_to_cut), (out[cluster_indices[-1]][0][1] + epsilon_to_cut)), segment])
 
-    segments.sort(key=lambda x: x[0][0])
-    return segments
+    segments.sort(key=lambda x: x[1], reverse=True)
+    t = segments
+    t.sort(key=lambda x: x[0][0])
+
+    duration = []
+    for i in t:
+        duration.append((i[0][1]-i[0][0])/1000)
+
+    coef_of_long_vert_vid = np.mean(duration)+np.std(duration)
+    long_videos = []
+    short_videos = []
+    for i in range(len(t)):
+        if duration[i] >= coef_of_long_vert_vid:
+            long_videos.append(t[i])
+        else:
+            short_videos.append(t[i])
+
+    if shortDescription:
+        return short_videos
+    else:
+        return long_videos
+
+
