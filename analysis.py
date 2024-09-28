@@ -2,7 +2,6 @@ import cv2
 import librosa
 import numpy as np
 import scipy
-import time
 from skimage.feature import hog
 
 

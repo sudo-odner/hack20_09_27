@@ -1,5 +1,3 @@
-from typing import List
-
 import whisper_timestamped as whisper  # For convert to text, STT (Speach to text)
 import torch  # For whisper
 from moviepy.editor import VideoFileClip  # For convert MP4 to MP3
