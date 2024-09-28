@@ -4,7 +4,7 @@ import aiofiles
 import uvicorn
 from fastapi import FastAPI, UploadFile
 
-from analysis import text_analysis, audio_analysis, video_analysis, get_overal
+from analysis import text_analysis, audio_analysis, video_analysis, fragments
 from covert import STT, SentimentAnalysis
 
 app = FastAPI()
@@ -61,12 +61,18 @@ def get_fragment(_id: str):
     dataVideo = video_analysis(pathMP4)
 
     # Merge data and get best timing
-    overal = get_overal(dataText, dataAudio, dataVideo)
-
+    fragment = fragments(dataText, dataAudio, dataVideo)
+    answer_dict = list()
+    for data in fragment:
+        answer_dict.append({
+            "startTime": data[0][0],
+            "endTime": data[0][1],
+        })
+        
     # Add emotion people(emoji)
 
-    print(overal)
-    return {"status": True}
+    print(fragment)
+    return {"status": True, "data": answer_dict}
 
 
 if __name__ == "__main__":

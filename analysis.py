@@ -120,48 +120,71 @@ def video_analysis(video_path: str, take_every_n_frame=50, border_of_std=0.1) ->
     return coef
 
 
-def get_overal(dataText: list[tuple[tuple[int, int], float]], dataAudio: list[tuple[tuple[int, int], float]], dataVido: list[tuple[tuple[int, int], float]]) -> list[tuple[tuple[int, int], float]]:
-    overal = []
+def min_max_norm(data):
+    # Масштабирование Min-Max
+    min_val = np.min(data)
+    max_val = np.max(data)
+    scaled_data = (data - min_val) / (max_val - min_val)
+    return scaled_data
 
-    for period in dataAudio:
-        start = period[0][0]
-        end = period[0][1]
 
-        if end-start>100:
-            for frame_period in dataVido:
-                fr_start = period[0][0]
-                fr_end = period[0][1]
+def merge_sections(first_seq, second_seq, third_seq, weight_of_first_seq, weight_of_second_seq, weight_of_third_seq):
+    out = []
 
-                if start <= fr_start and end >= fr_end:
-                    if fr_start - start > 0:
-                        overal.append([(start, fr_start-1), period[1]])
+    time1 = [i[0] for i in first_seq]
+    coef1 = min_max_norm([i[1] for i in first_seq])
 
-                    overal.append([(fr_start, fr_end), period[1]+frame_period[1]])
+    time2 = [i[0] for i in second_seq]
+    coef2 = min_max_norm([i[1] for i in second_seq])
 
-                    if end - fr_end > 0:
-                        start = fr_end+1
-                    else:
-                        start = end
-                        break
+    time3 = [i[0] for i in third_seq]
+    coef3 = min_max_norm([i[1] for i in third_seq])
 
-                elif start <= fr_start and end <= fr_end:
-                    if fr_start - start > 0:
-                        overal.append([(start, fr_start-1), period[1]])
+    a = np.zeros(max(first_seq[-1][0][1],second_seq[-1][0][1], third_seq[-1][0][1]))
 
-                    overal.append([(fr_start, end), period[1]+frame_period[1]])
+    for sec in range(len(first_seq)):
+        a[time1[sec][0]:time1[sec][1]+1] += coef1[sec] * weight_of_first_seq
 
-                    start = end
-                    break
+    for sec in range(len(second_seq)):
+        a[time2[sec][0]:time2[sec][1]+1] += coef2[sec] * weight_of_second_seq
 
-                elif start >= fr_start and end >= fr_end:
-                    overal.append([(start, fr_end), period[1]+frame_period[1]])
+    for sec in range(len(third_seq)):
+        a[time3[sec][0]:time3[sec][1]+1] += coef3[sec] * weight_of_third_seq
 
-                    if end - fr_end > 0: start = fr_end+1
-                    else:
-                        start = end
-                        break
+    s, f = 0, 0
+    n = a[0]
+    for ms in a:
+        if ms == n:
+            f += 1
+        else:
+            if f-s > 10 and n != 0: out.append([(s,f),float(n)])
+            n = ms
+            s = f+1
+            f = s
 
-                if end - start < 0: break
+    return out
 
-            if end - start > 0: overal.append([(start, end), period[1]])
-    return overal
+
+def fragments(dataText: list[tuple[tuple[int, int], float]], dataAudio: list[tuple[tuple[int, int], float]], dataVido: list[tuple[tuple[int, int], float]], k=0.1, points_between_peaks=2) -> list[tuple[tuple[int, int], float]]:
+    out = merge_sections(dataText, dataVido, dataAudio, 15, 5, 25)
+    coefs = np.array([subarray[1] for subarray in out])
+
+    out_indices = np.where(coefs > k*np.mean(coefs))[0]
+
+    clusters = scipy.cluster.hierarchy.fcluster(
+        scipy.cluster.hierarchy.linkage(out_indices[:,None], method='single'),
+        t=points_between_peaks, criterion='distance')
+    print(len(clusters))
+
+    segments = []
+    for cluster_id in set(clusters):
+        cluster_indices = out_indices[clusters == cluster_id]
+        segment = 0
+        for i in cluster_indices:
+            segment += out[i][1]
+        len_of_sec = out[cluster_indices[-1]][0][1]-out[cluster_indices[0]][0][0]
+        if 10000 < len_of_sec < 3 * 60* 1000:
+            segments.append(((out[cluster_indices[0]][0][0], out[cluster_indices[-1]][0][1]), segment))
+
+    segments.sort(key=lambda x: x[0][0])
+    return segments
