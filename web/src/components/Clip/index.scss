@@ -1,0 +1,26 @@
+@import "../../styles/variables.scss";
+.clip {
+    display: flex;
+    cursor: pointer;
+    flex-direction: column;
+    padding: 0.5em 1em;
+    border-radius: $border-radius-1;
+    .clip-cover {
+        overflow: hidden;
+        border-radius: $border-radius-2;
+        width: 100px;
+        max-height: 240px;
+        .clip-cover-img {
+            width: 100%;
+            border-radius: $border-radius-2;
+        }
+    }
+    .clip-details {
+        .homeproject-title {}
+        .homeproject-date {}
+    }
+}
+
+.chosen {
+    background: $input-active;
+}

@@ -2,20 +2,21 @@ import imageio
 import base64
 import re
 import numpy as np
-import PIL
-from PIL import Image, ImageDraw, ImageFont
-import io
+import cv2
 
 
 async def get_cover(video_path):
-    reader = imageio.get_reader(video_path)
+    cap = cv2.VideoCapture(video_path)
+    ret, frame = cap.read()
+    cap.release()
 
-    for frame in reader:
-        res = frame
-        break
+    if not ret:
+        return None
 
-    reader.close()
-    return res.tobytes()
+    frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+
+    _, buffer = cv2.imencode('.jpg', frame_rgb)
+    return buffer
 
 
 async def bytes2img(bytes):

@@ -1,10 +1,25 @@
 version: '3'
 services:
+    react:
+        container_name: react_web
+        build:
+            context: ./
+            dockerfile: Dockerfile_react
+        ports:
+            - "3000:3000"
+        volumes:
+            - ./public/:/opt/react/public
+            - ./src/:/opt/react/src
+        depends_on:
+            - app
+        # networks:
+        #     - app-net
+
     app:
         container_name: app_web
         build:
             context: ./
-            dockerfile: Dockerfile
+            dockerfile: Dockerfile_app
         command: python main.py
         volumes:
             - ./storage/:/opt/web/storage
@@ -19,8 +34,8 @@ services:
         depends_on:
             - db
             # - model
-        networks:
-            - app-net
+            # networks:
+            #     - app-net
     db:
         container_name: db_web
         image: postgres:15
@@ -31,5 +46,6 @@ services:
         env_file:
             - .env
 
-networks:
-    app-net:
+# networks:
+#     app-net:
+#         driver: bridge

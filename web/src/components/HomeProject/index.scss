@@ -1,0 +1,20 @@
+@import "../../styles/variables.scss";
+.homeproject {
+    display: flex;
+    cursor: pointer;
+    flex-direction: column;
+    margin: 0.5em 1em;
+    .homeproject-cover {
+        overflow: hidden;
+        border-radius: $border-radius-3;
+        width: 120px;
+        height: 120px;
+        .homeproject-cover-img {
+            width: 100%
+        }
+    }
+    .homeproject-details {
+        .homeproject-title {}
+        .homeproject-date {}
+    }
+}

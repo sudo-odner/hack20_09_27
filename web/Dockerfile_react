@@ -1,0 +1,14 @@
+FROM node:18-alpine
+
+WORKDIR /opt/react/
+
+COPY package*.json ./
+
+RUN yarn install --production
+
+COPY ./public /opt/react/public
+COPY ./src /opt/react/src
+
+
+CMD ["yarn", "start"]  
+

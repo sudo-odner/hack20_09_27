@@ -1,0 +1,100 @@
+@import "../../styles/variables.scss";
+.project {
+    display: flex;
+    width: 100%;
+    flex-direction: row;
+    // align-items: center;
+    .sidebar {
+        padding: 1em;
+        height: calc(100vh - 2em);
+        overflow: hidden;
+        flex: 1;
+        overflow-y: scroll;
+        // width: 500px;
+        .search {
+            .srchBrWrapper>* {
+                // flex: 1;
+                margin-left: 0.5em;
+                height: 30px;
+                padding: 0.3em;
+            }
+            .srchBrWrapper>*:last-child {
+                margin-right: 0.5em;
+                // padding: 0em;
+            }
+            background: $input-inactive;
+            border-radius: $border-radius-1;
+            // position: fixed;
+            margin: 1em 0;
+            .srchBrWrapper {
+                display: flex;
+                flex-direction: row;
+                align-items: center;
+                justify-content: space-between;
+                input {
+                    // flex: 7;
+                    margin-left: 0.5em;
+                    // height: 36px;
+                    font-size: 23px;
+                    background: $input-inactive;
+                    color: $input-text-inactive;
+                    border: none;
+                    width: 100%;
+                    padding: 0.5em;
+                    border: none;
+                    // padding-left: 0;
+                }
+                input:active {
+                    border: none;
+                }
+            }
+            .filters {
+                margin: 0.8em;
+                .themes {
+                    margin-top: 1em;
+                }
+                input {
+                    margin: 1em;
+                }
+                .list {
+                    .el {
+                        display: flex;
+                        flex-direction: row;
+                        align-items: center;
+                    }
+                }
+            }
+        }
+        .clips {
+            width: 100%;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+        }
+    }
+    .editor {
+        flex: 2;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: space-evenly;
+        h3 {
+            width: max-content;
+            margin: 1em;
+        }
+        .videoeditor {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            // margin-left: 1em;
+        }
+    }
+    .subtitles {
+        padding: 1em;
+        height: calc(100vh - 2em);
+        overflow: hidden;
+        flex: 2;
+        overflow-y: scroll;
+        // width: 800px;
+    }
+}

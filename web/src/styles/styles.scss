@@ -1,0 +1,113 @@
+@import "./variables.scss";
+@import url('https://fonts.googleapis.com/css2?family=Onest:wght@100;300;400;500;600;700;800;900&display=swap');
+#root {
+    background: $main-bg;
+    color: $main-text;
+    font-size: 20px;
+    display: block;
+    margin: 0;
+    padding: 0;
+}
+
+* {
+    font-family: $rutube, "roboto";
+}
+
+body {
+    margin: 0;
+    padding: 0;
+}
+
+.light-text {
+    color: $light-text;
+}
+
+.head {
+    font-weight: 500;
+    font-size: 36px;
+}
+
+.button {
+    font-size: 25px;
+    font-weight: 400;
+    cursor: pointer;
+}
+
+a {
+    text-decoration: none;
+}
+
+input {
+    border: 1px solid $input-active;
+    color: white;
+}
+
+input:focus {
+    // border: 1px solid $input-inactive;
+    border: none;
+    box-shadow: none;
+    color: white;
+    // background: $input-active;
+}
+
+.input {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    input {
+        margin-top: 0.5em;
+        padding: 1em;
+        font-size: 23px;
+        width: calc(100% - 2em);
+        border-radius: $border-radius-1;
+        border: 1px solid $input-active;
+        background: $input-inactive;
+    }
+    input:focus {
+        background: $input-active;
+    }
+    margin-top: 1em;
+}
+
+.capitalize {
+    text-transform: capitalize;
+}
+
+.c {
+    cursor: pointer;
+}
+
+h3 {
+    font-size: large;
+    margin: 0;
+}
+
+p {
+    font-size: medium;
+    margin: 0;
+}
+
+.createbutton {
+    cursor: pointer;
+    width: 90%;
+    margin-bottom: 1em;
+    .createbutton-wrapper {
+        padding: 0.3em 1em;
+        border-radius: $border-radius-2;
+        text-align: center;
+        background: $bright;
+        font-weight: bold;
+    }
+}
+
+.backbutton {
+    cursor: pointer;
+    width: 100%;
+    .backbutton-wrapper {
+        padding: 0.3em 1em;
+        border-radius: $border-radius-2;
+        text-align: center;
+        background: $bright;
+        font-weight: bold;
+    }
+}

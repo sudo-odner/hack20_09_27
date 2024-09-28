@@ -8,3 +8,5 @@ alembic
 psycopg2
 python-multipart
 imageio[ffmpeg]
+fastapi-utils
+opencv-python
