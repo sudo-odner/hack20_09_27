@@ -55,9 +55,9 @@ function App() {
   return (
     <div className="App">
       <Routes>
-        <Route path='/' element={<Home/>}/>
+        <Route path='/' element={<Home/>}/> 
         <Route path='/create' element={<Create/>}/>
-        <Route path='/project/:project_id' element={<Project/>}/>
+        <Route path='/project/:project_id' element={<Project/>}/> 
       </Routes>
     </div>
   );

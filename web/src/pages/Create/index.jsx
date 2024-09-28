@@ -1,8 +1,9 @@
 import React, { useRef, useState, useEffect } from "react";
 import "./index.scss";
 import { useNavigate } from "react-router-dom";
-import server_url from "../../site";
+// import server_url from "../../site";
 import FileUI from "../../components/FileUI";
+import {MetroSpinner, TraceSpinner, BarsSpinner, PongSpinner} from "react-spinners-kit";
 
 function Create({ setCookie, setCookieR }) {
     const to = useNavigate();
@@ -60,17 +61,14 @@ function Create({ setCookie, setCookieR }) {
         to("/")
     }
 
-    let load_view = <div className="create-wrapper"><h1 className="h1">Новый проект</h1>
+    let load_view = <div className="create-wrapper">
         <div className="create-field">
-            <p>Генерируем виральные моменты..</p>
-            <div className="uploadbutton button">
+            <p style={{margin:"1em"}}>Генерируем виральные моменты..</p>
+            <div className="loadingview">
                 <div
-                    onClick={() => {
-                        home();
-                    }}
-                    className="uploadbutton-wrapper button"
+                    className="loading"
                 >
-                    Все проекты
+                    <PongSpinner color="#12cced"/>
                 </div>
                 <p className="b4" color="red">
                     {errorMes}
