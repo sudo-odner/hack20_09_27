@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker, relationship
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import (Boolean, Column, ForeignKey, Integer,
-                        String, Table, LargeBinary, DateTime, Time, event)
+                        String, Table, LargeBinary, DateTime, event)
 
 load_dotenv()
 
@@ -66,7 +66,7 @@ class Clip(Base):
     cover = Column(LargeBinary, nullable=True)
     tags = Column(String, nullable=True)
     subtitles = Column(String, nullable=True)
-    start = Column(Time, nullable=False)
-    end = Column(Time, nullable=False)
+    start = Column(Integer, nullable=True)
+    end = Column(Integer, nullable=True)
     subtitle = Column(Boolean, nullable=False)
     adhd = Column(Boolean, nullable=False)

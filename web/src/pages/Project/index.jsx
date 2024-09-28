@@ -54,7 +54,7 @@ function Project() {
     useEffect(() => {
         const fetchUser = async () => {
             try {
-                const response = await fetch(`http://localhost:8000/api/get_clips?project_id=${project_id}`, {
+                const response = await fetch(`http://localhost:8000/api/get_clips/${project_id}`, {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',

@@ -1,4 +1,5 @@
 import os
+import shutil
 from fastapi import FastAPI, File, UploadFile, Request, Form
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
@@ -57,6 +58,11 @@ class App(FastAPI):
         await queries.set_cover_project(project_id, cover)
 
         os.makedirs(f"storage/{project_id}/clips", exist_ok=True)
+        duration = await video_tools.get_duration(f"storage/{project_id}/{filename}")
+        clip_id = await queries.create_clip(project_id, filename, duration, cover)
+
+        shutil.copy2(f"storage/{project_id}/{filename}",
+                     f"storage/{project_id}/clips/{clip_id}.mp4")
 
         return JSONResponse({"project_id": project_id}, 201)
 

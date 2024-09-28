@@ -1,6 +1,6 @@
-import imageio
-import base64
 import re
+import base64
+
 import numpy as np
 import cv2
 
@@ -13,10 +13,20 @@ async def get_cover(video_path):
     if not ret:
         return None
 
-    frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-
-    _, buffer = cv2.imencode('.jpg', frame_rgb)
+    _, buffer = cv2.imencode('.jpg', frame)
     return buffer
+
+
+async def get_duration(video_path):
+    cap = cv2.VideoCapture(video_path)
+
+    fps = cap.get(cv2.CAP_PROP_FPS)
+    total_frames = cap.get(cv2.CAP_PROP_FRAME_COUNT)
+    duration = total_frames / fps
+
+    cap.release()
+
+    return int(duration * 1000)
 
 
 async def bytes2img(bytes):
@@ -24,26 +34,32 @@ async def bytes2img(bytes):
 
 
 async def change_resolution_and_extension(video_path, new_resolution, new_extension):
-    reader = imageio.get_reader(video_path)
-    fps = reader.get_meta_data()['fps']
+    r = int(new_resolution[:-1])
+    resoluion = (r, r * 16 // 9)
 
-    match = re.search(r"(\d+)p", new_resolution)
+    cap = cv2.VideoCapture(video_path)
 
-    new_height = int(match.group(1))
-    new_width = int(new_height * 16 / 9)
+    width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+    height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
 
-    new_video_path = video_path.replace(
-        video_path.split('.')[-1], new_extension)
-    writer = imageio.get_writer(new_video_path, fps=fps)
+    if resoluion == (height, width):
+        return
 
-    for frame in reader:
-        resized_frame = np.array(frame)
-        resized_frame = imageio.imresize(
-            resized_frame, (new_height, new_width))
+    fourcc = cv2.VideoWriter_fourcc(*new_extension.upper())
 
-        writer.append_data(resized_frame)
+    out_video_path = '.'.join(video_path.split('.')[:-1]) + '.' + new_extension
+    output_video = cv2.VideoWriter(
+        out_video_path, fourcc, cap.get(cv2.CAP_PROP_FPS), resoluion)
 
-    writer.close()
-    reader.close()
+    while (True):
+        ret, frame = cap.read()
+        if not ret:
+            break
 
-    return new_video_path
+        resized_frame = cv2.resize(
+            frame, resoluion, interpolation=cv2.INTER_AREA)
+
+        output_video.write(resized_frame)
+
+    cap.release()
+    output_video.release()
