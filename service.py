@@ -24,22 +24,20 @@ async def upload_video_mp4(file: UploadFile):
     if not os.path.exists(pathDict):
         os.makedirs(pathDict)
 
-    print(1)
     async with aiofiles.open(f"{pathDict}/{fileName}", 'wb') as f:
         content = await file.read()  # async read
         await f.write(content)  # async write
 
-    print(2, )
     new_id = stt.convertMP4(f"{pathDict}/{fileName}")
     os.rename(f"{pathDict}/{fileName}", f"{pathDict}/{new_id}.mp4")
 
-    return {"status": False, "id": new_id}
+    return {"status": True, "id": new_id}
 
 
-@app.get("/video/{id}/text")
-def get_text(id: str):
-
-    return {"Hello": "World"}
+@app.get("/video/{_id}/text")
+def get_text(_id: str):
+    _, wordData, status = stt.loadData(_id)
+    return {"status": status, "data": wordData}
 
 
 @app.get("/video/{id}/fragments")

@@ -55,20 +55,20 @@ class STT:
             pickle.dump(saveData, file, protocol=pickle.HIGHEST_PROTOCOL)
         return _id
 
-    def loadData(self, _id: str) -> (str, list[dict]):
+    def loadData(self, _id: str) -> (str, list[dict], bool):
         absPath = os.path.abspath("")
         pathDict = f"{absPath}/user"
 
         # Check created file
         if not os.path.isfile(f"{pathDict}/{_id}.pickle"):
             print("File does not exist")
-            return "", list()
+            return "", list(), False
 
         # Open file
         with open(f"{pathDict}/{_id}.pickle", 'rb') as file:
             data = pickle.load(file)
 
-        return data["text"], data["word_data"]
+        return data["text"], data["word_data"], True
 
     def convertMP3(self, pathToMP3: str) -> str:
         text, word_data = self.convertMP3ToText(pathToMP3)
