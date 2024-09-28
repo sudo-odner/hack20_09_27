@@ -1,8 +1,4 @@
-FROM python:3.11
-
-WORKDIR /opt/web/
-
-COPY . /opt/web/
+FROM python:3.11 AS builder
 
 ENV DOCKER_CONTAINER=1
 
@@ -12,5 +8,11 @@ COPY requirements.txt ./
 
 RUN  pip install --upgrade pip \
     && pip install -r requirements.txt
+
+FROM builder as runtime
+
+WORKDIR /opt/web/
+
+COPY . /opt/web/
 
 CMD ["python", "main.py"]

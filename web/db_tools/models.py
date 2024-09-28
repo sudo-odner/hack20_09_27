@@ -52,6 +52,7 @@ class Project(Base):
     name = Column(String, nullable=False)
     cover = Column(LargeBinary, nullable=True)
     datetime = Column(DateTime, nullable=False)
+    token_model = Column(String, nullable=True)
     users = relationship(
         'User', secondary=user_project, back_populates='projects')
 

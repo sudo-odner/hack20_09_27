@@ -10,10 +10,10 @@ services:
         volumes:
             - ./public/:/opt/react/public
             - ./src/:/opt/react/src
+            - ./package-lock.json/:/opt/react/package-lock.json
+            - ./package.json/:/opt/react/package.json
         depends_on:
             - app
-        # networks:
-        #     - app-net
 
     app:
         container_name: app_web
@@ -26,6 +26,7 @@ services:
             - ./db_tools/:/opt/web/db_tools
             - ./alembic/:/opt/web/alembic
             - ./main.py/:/opt/web/main.py
+            - ./model.py/:/opt/web/model.py
             - ./video_tools.py/:/opt/web/video_tools.py
         ports:
             - "8000:8000"
@@ -33,9 +34,6 @@ services:
             - .env
         depends_on:
             - db
-            # - model
-            # networks:
-            #     - app-net
     db:
         container_name: db_web
         image: postgres:15
@@ -45,7 +43,3 @@ services:
             - ./postgres_data/:/var/lib/postgresql/data
         env_file:
             - .env
-
-# networks:
-#     app-net:
-#         driver: bridge
