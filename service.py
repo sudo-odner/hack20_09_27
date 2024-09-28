@@ -3,10 +3,13 @@ import uuid
 import aiofiles
 import uvicorn
 from fastapi import FastAPI, UploadFile
-from covert import STT
+
+from analysis import text_analysis, audio_analysis
+from covert import STT, SentimentAnalysis
 
 app = FastAPI()
 stt = STT("base")
+sa = SentimentAnalysis()
 
 
 @app.post("/upload-video-mp4")
@@ -40,9 +43,21 @@ def get_text(_id: str):
     return {"status": status, "data": wordData}
 
 
-@app.get("/video/{id}/fragments")
-def get_fragment():
-    return {"Hello": "World"}
+@app.get("/video/{_id}/fragments")
+def get_fragment(_id: str):
+    absPath = os.path.abspath("")
+    pathDict = f"{absPath}/user"
+
+    _, word_data, status = stt.loadData(_id)
+    if status == False:
+        return {"status": False}
+
+    pathMP4 = os.path.abspath(f"{pathDict}/data/{_id}.mp4")
+    sa.sentimentWordData(word_data)
+    print(text_analysis(word_data))
+    print(audio_analysis(pathMP4))
+
+    return {"status": True}
 
 
 if __name__ == "__main__":

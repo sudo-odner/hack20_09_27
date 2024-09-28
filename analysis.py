@@ -22,7 +22,7 @@ def audio_analysis(video_path, seconds_between_grouped_peaks=1) -> list[tuple[tu
     for cluster_id in set(clusters):
         cluster_indices = peak_indices[clusters == cluster_id]
         segment_energy = np.sum(rms[cluster_indices])
-        segment_energies.append(((round(times[cluster_indices[0]] * sr),round(times[cluster_indices[-1]] * sr)), segment_energy))
+        segment_energies.append(((round(times[cluster_indices[0]] * 1000), round(times[cluster_indices[-1]] * 1000)), segment_energy))
 
     segment_energies.sort(key=lambda x: x[0][0])
 
