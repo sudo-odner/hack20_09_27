@@ -90,11 +90,11 @@ function Project() {
 
               if (response.ok) {
                   console.log('Success:', response.status);
+                  console.log(response.text())
                   let text = await response.text();
-
                   const data = JSON.parse(text);
                   console.log(data)
-                  // setClip(data);
+                  setData(data);
 
               } else {
                   console.error(response.statusText);
@@ -105,7 +105,7 @@ function Project() {
       };
 
 
-        if (chosenClip !== -1) { setData({ title: `Short ${chosenClip}` }); loadVideo()} else { setData("") }
+        if (chosenClip !== -1) { loadVideo() } else { setData("") }
     }, [chosenClip]);
 
     return (
@@ -156,7 +156,7 @@ function Project() {
       {data ? [<div className="editor">
         <div className="videoeditor">
           <h3>{data.title}</h3>
-          <VideoEditor file={clip}/>
+          <VideoEditor file={data.video}/>
         </div>
       </div>, 
       <div className="settings">
