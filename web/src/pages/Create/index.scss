@@ -3,8 +3,8 @@
     // padding-top: 15vh;
     width: 100%;
     display: flex;
-    justify-content: space-around;
-    height: 100vh;
+    justify-content: space-evenly;
+    min-height: 100vh;
     .create-wrapper {
         height: 100%;
         width: 90vw;
@@ -27,21 +27,17 @@
             //     margin: 1em 0;
             //     padding: 0.5em 1em;
             // }
-            .createbutton {
-                margin: 3em 0;
-                width: 100%;
-            }
             .uploaded,
             .uploadbutton {
                 display: flex;
                 flex-direction: column;
                 align-items: center;
-                height: 50vh;
+                // height: 50vh;
                 // max-height: 40vh;
                 .videocover {
-                    width: 90%;
+                    width: 95%;
                     // max-height: 40vh;
-                    overflow: hidden;
+                    // overflow: hidden;
                     border-radius: $border-radius-2;
                     img {
                         border-radius: $border-radius-2;
@@ -49,8 +45,17 @@
                     }
                 }
             }
-            .uploadbutton {
+            .createbutton {
+                cursor: pointer;
                 width: 100%;
+                margin-top: 1em;
+                .createbutton-wrapper {
+                    padding: 0.7em 1em;
+                    border-radius: $border-radius-2;
+                    text-align: center;
+                    background: $bright;
+                    font-weight: bold;
+                }
             }
         }
     }

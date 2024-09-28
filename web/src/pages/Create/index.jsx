@@ -63,12 +63,12 @@ function Create({ setCookie, setCookieR }) {
     let load_view = <div className="create-wrapper"><h1 className="h1">Новый проект</h1>
         <div className="create-field">
             <p>Генерируем виральные моменты..</p>
-            <div className="createbutton">
+            <div className="uploadbutton button">
                 <div
                     onClick={() => {
                         home();
                     }}
-                    className="createbutton-wrapper"
+                    className="uploadbutton-wrapper button"
                 >
                     Все проекты
                 </div>
