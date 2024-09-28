@@ -1,0 +1,35 @@
+version: '3'
+services:
+    app:
+        container_name: app_web
+        build:
+            context: ./
+            dockerfile: Dockerfile
+        command: python main.py
+        volumes:
+            - ./storage/:/opt/web/storage
+            - ./db_tools/:/opt/web/db_tools
+            - ./alembic/:/opt/web/alembic
+            - ./main.py/:/opt/web/main.py
+            - ./video_tools.py/:/opt/web/video_tools.py
+        ports:
+            - "8000:8000"
+        env_file:
+            - .env
+        depends_on:
+            - db
+            # - model
+        networks:
+            - app-net
+    db:
+        container_name: db_web
+        image: postgres:15
+        ports:
+            - "5432:5432"
+        volumes:
+            - ./postgres_data/:/var/lib/postgresql/data
+        env_file:
+            - .env
+
+networks:
+    app-net:

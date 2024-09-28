@@ -1,0 +1,10 @@
+fastapi
+uvicorn
+python-dotenv
+pillow==9.5.0
+SQLAlchemy
+asyncpg
+alembic
+psycopg2
+python-multipart
+imageio[ffmpeg]

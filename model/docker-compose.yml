@@ -1,0 +1,17 @@
+version: '3'
+services:
+    app:
+        container_name: app_model
+        build:
+            context: ./
+            dockerfile: Dockerfile
+        command: python main.py
+        volumes:
+            - ./main.py/:/opt/model/main.py
+        ports:
+            - "8001:8000"
+        networks:
+            - app-net
+
+networks:
+    app-net:
