@@ -48,13 +48,13 @@ function Home() {
         <div className="home">
             <div className="main-container">
                 <div className="home-wrapper">
-                    <h1 className="home-title"><img width={"225px"} src="/logo.png" />PUTOSHKA</h1>
-                    <div className="createbutton">
+                    <h1 className="home-title" style={{color: "#ED143B"}}><img width={"225px"} src="/logo.png" />PUTOSHKA</h1>
+                    <div className="createbutton button">
                         <div
                             onClick={() => {
                                 create_project();
                             }}
-                            className="createbutton-wrapper"
+                            className="createbutton-wrapper button"
                         >
                             Новый проект
                         </div>

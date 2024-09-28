@@ -40,11 +40,12 @@ a {
 input {
     border: 1px solid $input-active;
     color: white;
+    font-weight: 300;
 }
 
 input:focus {
     // border: 1px solid $input-inactive;
-    border: none;
+    border: 1px solid $main-bg;
     box-shadow: none;
     color: white;
     // background: $input-active;
@@ -65,6 +66,7 @@ input:focus {
     }
     input:focus {
         background: $input-active;
+        border: 1px solid $main-bg;
     }
     margin-top: 1em;
 }
@@ -79,35 +81,12 @@ input:focus {
 
 h3 {
     font-size: large;
+    font-weight: 400;
     margin: 0;
 }
 
 p {
     font-size: medium;
     margin: 0;
-}
-
-.createbutton {
-    cursor: pointer;
-    width: 90%;
-    margin-bottom: 1em;
-    .createbutton-wrapper {
-        padding: 0.3em 1em;
-        border-radius: $border-radius-2;
-        text-align: center;
-        background: $bright;
-        font-weight: bold;
-    }
-}
-
-.backbutton {
-    cursor: pointer;
-    width: 100%;
-    .backbutton-wrapper {
-        padding: 0.3em 1em;
-        border-radius: $border-radius-2;
-        text-align: center;
-        background: $bright;
-        font-weight: bold;
-    }
+    font-weight: 300;
 }

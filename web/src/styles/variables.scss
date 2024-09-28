@@ -1,20 +1,31 @@
-$bright:#12CCED;
-$main-bg: #1C232B;
-$lec-bg:#fff;
-$main-text:#fff;
+$bright: #12cced;
+$main-bg: #1c232b;
+$lec-bg: #fff;
+$main-text: #fff;
 $light-text: #fff;
-$white:#fff;
-$black:#000;
-$input-inactive:#1C232B;
+$white: #fff;
+$black: #000;
+$input-inactive: #1c232b;
 $input-active: #29333D;
-$red: #E72F5C;
+$red: #e72f5c;
 $border-radius-1: 8px;
 $border-radius-2: 11px;
-$border-radius-3: 15px;
+$border-radius-3: 13px;
 $input-text-inactive: #fff;
-@font-face {
-    font-family: "Rutube";
-    src: url("../font/RF_RUTUBE_Light.ttf");
+@mixin font-face($font-family, $font-path, $font-weight, $font-style) {
+    @font-face {
+        font-family: $font-family;
+        src: url($font-path) format('truetype');
+        font-weight: $font-weight;
+        font-style: $font-style;
+    }
 }
 
+// @font-face {
+//     font-family: "Rutube";
+//     src: url("../font/RF_RUTUBE_Light.ttf");
+// }
+@include font-face( $font-family: "Rutube", $font-path: "../font/RF_RUTUBE_Light.ttf", $font-weight: 300, $font-style: "Regular");
+@include font-face( $font-family: "Rutube", $font-path: "../font/RF_RUTUBE_Medium.ttf", $font-weight: 400, $font-style: "Regular");
+@include font-face( $font-family: "Rutube", $font-path: "../font/RF_RUTUBE_Medium.ttf", $font-weight: 900, $font-style: "Regular");
 $rutube: "Rutube";
