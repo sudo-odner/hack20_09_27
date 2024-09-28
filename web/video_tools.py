@@ -24,7 +24,6 @@ async def bytes2img(bytes):
 
 
 async def change_resolution_and_extension(video_path, new_resolution, new_extension):
-
     reader = imageio.get_reader(video_path)
     fps = reader.get_meta_data()['fps']
 
