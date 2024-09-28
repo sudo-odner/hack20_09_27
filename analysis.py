@@ -72,7 +72,6 @@ def extract_frames_from_video(video_path: str, take_every_n_frame=50):
 
 def video_analysis(video_path: str, take_every_n_frame=50, border_of_std=0.1) -> list[tuple[tuple[int, int], float]]:
     frames = extract_frames_from_video(video_path, take_every_n_frame)
-    print(f"Извлечено {len(frames)} кадров из видео")
 
     average_hogs = []
     for i in range(len(frames)):
@@ -174,7 +173,6 @@ def fragments(dataText: list[tuple[tuple[int, int], float]], dataAudio: list[tup
     clusters = scipy.cluster.hierarchy.fcluster(
         scipy.cluster.hierarchy.linkage(out_indices[:,None], method='single'),
         t=points_between_peaks, criterion='distance')
-    print(len(clusters))
 
     segments = []
     for cluster_id in set(clusters):
