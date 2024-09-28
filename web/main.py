@@ -66,12 +66,12 @@ class App(FastAPI):
 
         os.makedirs(f"storage/{project_id}/clips", exist_ok=True)
         duration = await video_tools.get_duration(f"storage/{project_id}/{filename}")
-        clip_id = await queries.create_clip(project_id, filename, duration, cover, json.dumps(subtitles))
+        clip_id = await queries.create_clip(project_id, filename, duration, cover, "", json.dumps(subtitles))
 
         shutil.copy2(f"storage/{project_id}/{filename}",
                      f"storage/{project_id}/clips/{clip_id}.mp4")
 
-        for fragment in fragments:
+        for i, fragment in enumerate(fragments):
             l = -1
             r = len(subtitles) - 1
             while r - l > 1:
@@ -92,7 +92,8 @@ class App(FastAPI):
 
             subtitles_ = subtitles[s:l + 1]
 
-            clip_id = await queries.create_clip(project_id, filename, duration, cover, json.dumps(subtitles_), fragment["startTime"], fragment["endTime"])
+            cover = await video_tools.get_cover(f"storage/{project_id}/{filename}", fragment["startTime"])
+            clip_id = await queries.create_clip(project_id, str(i), fragment["endTime"] - fragment["startTime"], cover, "", json.dumps(subtitles_), fragment["startTime"], fragment["endTime"])
             await video_tools.cut_video_by_timestamps(f"storage/{project_id}/{filename}", [fragment], f"storage/{project_id}/clips/{clip_id}.mp4", subtitles_)
 
         return JSONResponse({"project_id": project_id}, 201)
@@ -112,7 +113,7 @@ class App(FastAPI):
 
         with zipfile.ZipFile(f"storage/{project_id}/clip.zip", 'w') as zipf:
             zipf.writestr('data.json', json.dumps({
-                "subtitles": clip.subtitles,
+                "subtitles": json.loads(clip.subtitles),
                 "tags": clip.tags,
                 "start": clip.start,
                 "end": clip.end,

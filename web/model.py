@@ -29,6 +29,8 @@ async def get_text(token_model):
     async with aiohttp.ClientSession() as session:
         async with session.get(URL + f"video/{token_model}/text") as response:
             data = await response.json()
+            if not data["status"]:
+                return []
 
             return data["data"]
 
@@ -37,5 +39,7 @@ async def get_fragments(token_model):
     async with aiohttp.ClientSession() as session:
         async with session.get(URL + f"video/{token_model}/fragments") as response:
             data = await response.json()
+            if not data["status"]:
+                return []
 
             return data["data"]

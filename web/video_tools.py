@@ -9,13 +9,13 @@ font_path = "public/RUTUBE_Font/RF_RUTUBE_Bold.ttf"
 font = ImageFont.truetype(font_path, 60)
 
 
-async def get_cover(video_path):
+async def get_cover(video_path, timing=0):
     cap = cv2.VideoCapture(video_path)
-    ret, frame = cap.read()
-    cap.release()
+    fps = cap.get(cv2.CAP_PROP_FPS)
 
-    if not ret:
-        return None
+    cap.set(cv2.CAP_PROP_POS_FRAMES, timing * fps // 1000)
+    _, frame = cap.read()
+    cap.release()
 
     _, buffer = cv2.imencode('.jpg', frame)
     return buffer
@@ -69,7 +69,7 @@ async def change_resolution_and_extension(video_path, new_resolution, new_extens
     output_video.release()
 
 
-def video2adhd(main_video_dir, main_video, adhd_video):
+async def video2adhd(main_video_dir, main_video, adhd_video):
     top_cap = cv2.VideoCapture(f"{main_video_dir}/{main_video}")
     bottom_cap = cv2.VideoCapture(adhd_video)
 
@@ -109,7 +109,7 @@ def video2adhd(main_video_dir, main_video, adhd_video):
     os.rename(f"{main_video_dir}/out.mp4", f"{main_video_dir}/{main_video}")
 
 
-def cut_video_by_timestamps(video_path, timestamps, out_video_path, subtitles):
+async def cut_video_by_timestamps(video_path, timestamps, out_video_path, subtitles):
     cap = cv2.VideoCapture(video_path)
     fps = cap.get(cv2.CAP_PROP_FPS)
 
