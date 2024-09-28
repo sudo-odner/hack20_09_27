@@ -14,6 +14,7 @@ function Project() {
     const to = useNavigate();
 
     const [chosenClip, chooseClip] = useState(-1);
+    const [clip, setClip] = useState("")
 
     function home() {
         to("/");
@@ -78,7 +79,33 @@ function Project() {
 
         fetchUser();
 
-        if (chosenClip !== -1) { setData({ title: `Short ${chosenClip}` }) } else { setData("") }
+        const loadVideo = async () => {
+          try {
+              const response = await fetch(`http://localhost:8000/api/get_clip/${chosenClip}`, {
+                  method: 'GET',
+                  headers: {
+                      'Content-Type': 'application/json',
+                  },
+              });
+
+              if (response.ok) {
+                  console.log('Success:', response.status);
+                  let text = await response.text();
+
+                  const data = JSON.parse(text);
+                  console.log(data)
+                  // setClip(data);
+
+              } else {
+                  console.error(response.statusText);
+              }
+          } catch (error) {
+              console.error('Error fetching projects:', error);
+          }
+      };
+
+
+        if (chosenClip !== -1) { setData({ title: `Short ${chosenClip}` }); loadVideo()} else { setData("") }
     }, [chosenClip]);
 
     return (
@@ -129,7 +156,7 @@ function Project() {
       {data ? [<div className="editor">
         <div className="videoeditor">
           <h3>{data.title}</h3>
-          <VideoEditor />
+          <VideoEditor file={clip}/>
         </div>
       </div>, 
       <div className="settings">

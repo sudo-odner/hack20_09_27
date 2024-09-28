@@ -11,17 +11,36 @@ function Clip({ clip_id = 0, chooseClip, chosenClip}) {
     duration: "",
   });
 
-  const load_clip_data = (id) => {
-    return {
-      "clip_id": clip_id,
-      cover: "https://i.pinimg.com/564x/df/16/82/df16827a9e9888c7cc0988ade16b879c.jpg",
-      title: `Short ${clip_id}`,
-      duration: "23 sec",
-    };
+  useEffect(() => {
+
+
+    const fetchClipDetail = async () => {
+      try {
+          const response = await fetch(`http://localhost:8000/api/get_clip_details/${clip_id}`, {
+              method: 'GET',
+              headers: {
+                  'Content-Type': 'application/json',
+              },
+          });
+
+          if (response.ok) {
+              console.log('Success:', response.status);
+              let text = await response.text();
+
+              const data = JSON.parse(text);
+              data['cover'] =  `data:image/jpeg;base64,${data['cover']}`
+              setClipData(data);
+
+          } else {
+              console.error(response.statusText);
+          }
+      } catch (error) {
+          console.error('Error fetching projects:', error);
+      }
   };
 
-  useEffect(() => {
-    setClipData(load_clip_data(clip_id));
+
+    fetchClipDetail();
   }, [clip_id]);
 
   return (
@@ -35,7 +54,7 @@ function Clip({ clip_id = 0, chooseClip, chosenClip}) {
       </div>
       <div className="clip-details">
         <h3 className="clip-title">{clipData.title}</h3>
-        <p className="clip-date">{clipData.duration}</p>
+        <p className="clip-date">{clipData.duration/1000} сек</p>
       </div>
     </div>
   );

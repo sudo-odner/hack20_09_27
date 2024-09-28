@@ -7,10 +7,11 @@ import { faLightbulb, faMoon } from '@fortawesome/free-solid-svg-icons'
 
 class VideoEditor extends React.Component {
     constructor(props) {
+        console.log(props)
         super(props);
         this.state = {
-            isUpload: true,
-            videoUrl: "",
+            isUpload: false,
+            videoUrl: window.URL.createObjectURL(props.file),
             isDarkMode: true,
             timings: []
         }
@@ -71,17 +72,17 @@ class VideoEditor extends React.Component {
         this.setState({isDarkMode: !this.state.isDarkMode})
     }
 
-    upload_file = (fileInput) => {
-		let fileUrl = window.URL.createObjectURL(fileInput[0]);
-        let filename = fileInput.name;
-        this.setState({
-            isUpload: false,
-            videoUrl: fileUrl
-        })
-    }
+    // upload_file = (fileInput) => {
+	// 	let fileUrl = 
+    //     let filename = fileInput.name;
+    //     this.setState({
+    //         isUpload: false,
+    //         videoUrl: fileUrl
+    //     })
+    // }
 
     render = () => {
-        return this.state.isUpload ? this.render_uploader() : this.render_editor()
+        return this.render_editor()
                 // <div className={"theme_toggler"} onClick={this.toggleThemes}>{this.state.isDarkMode? (<i className="toggle" aria-hidden="true"><FontAwesomeIcon icon={faLightbulb} /></i>) : <i className="toggle"><FontAwesomeIcon icon={faMoon} /></i>}</div>
     
         
