@@ -14,6 +14,7 @@ sa = SentimentAnalysis()
 
 @app.post("/upload-video-mp4")
 async def upload_video_mp4(file: UploadFile):
+    print("Start video upload")
     # Check type file
     name, _type = file.filename.split(".")
     if _type != "mp4":
@@ -39,12 +40,14 @@ async def upload_video_mp4(file: UploadFile):
 
 @app.get("/video/{_id}/text")
 def get_text(_id: str):
+    print("Start create text video")
     _, wordData, status = stt.loadData(_id)
     return {"status": status, "data": wordData}
 
 
 @app.get("/video/{_id}/fragments")
 def get_fragment(_id: str):
+    print("Start create fragments video")
     absPath = os.path.abspath("")
     pathDict = f"{absPath}/user"
 
