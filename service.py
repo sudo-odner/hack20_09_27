@@ -49,18 +49,23 @@ def get_fragment(_id: str):
     pathDict = f"{absPath}/user"
 
     _, word_data, status = stt.loadData(_id)
-    if status == False:
+    if not status:
         return {"status": False}
 
     pathMP4 = os.path.abspath(f"{pathDict}/data/{_id}.mp4")
     sa.sentimentWordData(word_data)
+
+    # Create three data analiz text, audio, video
     dataText = text_analysis(word_data)
     dataAudio = audio_analysis(pathMP4)
     dataVideo = video_analysis(pathMP4)
 
+    # Merge data and get best timing
     overal = get_overal(dataText, dataAudio, dataVideo)
-    print(overal)
 
+    # Add emotion people(emoji)
+
+    print(overal)
     return {"status": True}
 
 
