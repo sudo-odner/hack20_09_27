@@ -1,11 +1,13 @@
-import os
-import shutil
-from fastapi import FastAPI, File, UploadFile, Request, Form
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
-
-from db_tools import queries
 import video_tools
+from db_tools import queries
+from fastapi.responses import JSONResponse, FileResponse
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi import FastAPI, File, UploadFile, Request, Form
+import shutil
+import os
+import io
+import json
+import zipfile
 
 
 class App(FastAPI):
@@ -79,11 +81,19 @@ class App(FastAPI):
     async def get_clip(self, clip_id: int):
         clip, project_id = await queries.get_clip(clip_id)
 
-        with open(f"storage/{project_id}/clips/{clip.id}.mp4", "rb") as f:
-            video = f.read()
-        video = await video_tools.bytes2img(video)
+        with zipfile.ZipFile(f"storage/{project_id}/clip.zip", 'w') as zipf:
+            zipf.writestr('data.json', json.dumps({
+                "subtitles": clip.subtitles,
+                "tags": clip.tags,
+                "start": clip.start,
+                "end": clip.end,
+                "subtitle": clip.subtitle,
+                "adhd": clip.adhd
+            }))
+            with open(f"storage/{project_id}/clips/{clip.id}.mp4", "rb") as f:
+                zipf.writestr('video.mp4', f.read())
 
-        return JSONResponse({"video": video, "subtitles": clip.subtitles, "tags": clip.tags, "start": clip.start, "end": clip.end, "subtitle": clip.subtitle, "adhd": clip.adhd})
+        return FileResponse(f"storage/{project_id}/clip.zip", media_type="application/zip")
 
     async def update_clip(self, clip_id: int, subtitle: bool, adhd: bool):
         await queries.update_clip(clip_id, subtitle, adhd)
