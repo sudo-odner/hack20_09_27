@@ -118,3 +118,50 @@ def video_analysis(video_path: str, take_every_n_frame=50, border_of_std=0.1) ->
 
     coef.sort(key=lambda x: x[0][0])
     return coef
+
+
+def get_overal(dataText: list[tuple[tuple[int, int], float]], dataAudio: list[tuple[tuple[int, int], float]], dataVido: list[tuple[tuple[int, int], float]]) -> list[tuple[tuple[int, int], float]]:
+    overal = []
+
+    for period in dataAudio:
+        start = period[0][0]
+        end = period[0][1]
+
+        if end-start>100:
+            for frame_period in dataVido:
+                fr_start = period[0][0]
+                fr_end = period[0][1]
+
+                if start <= fr_start and end >= fr_end:
+                    if fr_start - start > 0:
+                        overal.append([(start, fr_start-1), period[1]])
+
+                    overal.append([(fr_start, fr_end), period[1]+frame_period[1]])
+
+                    if end - fr_end > 0:
+                        start = fr_end+1
+                    else:
+                        start = end
+                        break
+
+                elif start <= fr_start and end <= fr_end:
+                    if fr_start - start > 0:
+                        overal.append([(start, fr_start-1), period[1]])
+
+                    overal.append([(fr_start, end), period[1]+frame_period[1]])
+
+                    start = end
+                    break
+
+                elif start >= fr_start and end >= fr_end:
+                    overal.append([(start, fr_end), period[1]+frame_period[1]])
+
+                    if end - fr_end > 0: start = fr_end+1
+                    else:
+                        start = end
+                        break
+
+                if end - start < 0: break
+
+            if end - start > 0: overal.append([(start, end), period[1]])
+    return overal

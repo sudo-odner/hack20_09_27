@@ -4,7 +4,7 @@ import aiofiles
 import uvicorn
 from fastapi import FastAPI, UploadFile
 
-from analysis import text_analysis, audio_analysis
+from analysis import text_analysis, audio_analysis, video_analysis, get_overal
 from covert import STT, SentimentAnalysis
 
 app = FastAPI()
@@ -54,8 +54,12 @@ def get_fragment(_id: str):
 
     pathMP4 = os.path.abspath(f"{pathDict}/data/{_id}.mp4")
     sa.sentimentWordData(word_data)
-    print(text_analysis(word_data))
-    print(audio_analysis(pathMP4))
+    dataText = text_analysis(word_data)
+    dataAudio = audio_analysis(pathMP4)
+    dataVideo = video_analysis(pathMP4)
+
+    overal = get_overal(dataText, dataAudio, dataVideo)
+    print(overal)
 
     return {"status": True}
 
