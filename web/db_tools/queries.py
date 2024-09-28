@@ -107,6 +107,7 @@ async def create_clip(project_id, title, duration, cover, tags="", subtitles="",
         clip = Clip(project_id=project_id, title=title, duration=duration, cover=cover,
                     tags=tags, subtitles=subtitles, start=start, end=end, subtitle=subtitle, adhd=adhd)
         session.add(clip)
+        await session.flush()
         clip_id = clip.id
         await session.commit()
 
