@@ -110,11 +110,11 @@ async def delete_clip(clip_id):
         await session.commit()
 
 
-async def create_clip(project_id, title, duration, cover, tags="", subtitles="", start=None, end=None, subtitle=True, adhd=False):
+async def create_clip(project_id, title, duration, cover, about="", tags="", subtitles="", start=None, end=None, subtitle=True, adhd=False):
     async with async_session() as session:
-        clip = Clip(project_id=project_id, title=title, duration=duration, cover=cover,
+        clip = Clip(project_id=project_id, title=title, about=about, duration=duration, cover=cover,
                     tags=tags, subtitles=subtitles, start=start, end=end, subtitle=subtitle, adhd=adhd)
-        session.add(clip)
+        session.add(clip),
         await session.flush()
         clip_id = clip.id
         await session.commit()

@@ -94,8 +94,9 @@ class App(FastAPI):
 
             subtitles_ = subtitles[s:l + 1]
 
+            fragment_info = await model.get_fragment_info(subtitles_)
             cover = await video_tools.get_cover(f"storage/{project_id}/{filename}", fragment["startTime"])
-            clip_id = await queries.create_clip(project_id, str(i), fragment["endTime"] - fragment["startTime"], cover, "", json.dumps(subtitles_), fragment["startTime"], fragment["endTime"])
+            clip_id = await queries.create_clip(project_id, fragment_info["title"], fragment["endTime"] - fragment["startTime"], cover, fragment_info["about"], fragment_info["tags"], json.dumps(subtitles_), fragment["startTime"], fragment["endTime"])
             await video_tools.cut_video_by_timestamps(f"storage/{project_id}/{filename}", [fragment], f"storage/{project_id}/clips/{clip_id}.mp4", subtitles_)
 
         return JSONResponse({"project_id": project_id}, 201)
@@ -115,6 +116,9 @@ class App(FastAPI):
 
         with zipfile.ZipFile(f"storage/{project_id}/clip.zip", 'w') as zipf:
             zipf.writestr('data.json', json.dumps({
+                "title": clip.title,
+                "about": clip.about,
+                "tags": clip.tags,
                 "subtitles": json.loads(clip.subtitles),
                 "tags": clip.tags,
                 "start": clip.start,

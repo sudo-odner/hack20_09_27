@@ -37,6 +37,7 @@ def upgrade() -> None:
                     sa.Column('id', sa.Integer(), nullable=False),
                     sa.Column('project_id', sa.Integer()),
                     sa.Column('title', sa.String(), nullable=False),
+                    sa.Column('about', sa.String(), nullable=True),
                     sa.Column('duration', sa.Integer(), nullable=False),
                     sa.Column('cover', sa.LargeBinary(), nullable=True),
                     sa.Column('tags', sa.String(), nullable=True),

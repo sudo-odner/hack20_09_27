@@ -63,6 +63,7 @@ class Clip(Base):
     id = Column(Integer, primary_key=True)
     project_id = Column(Integer, ForeignKey('project.id'))
     title = Column(String, nullable=False)
+    about = Column(String, nullable=True)
     duration = Column(Integer, nullable=False)
     cover = Column(LargeBinary, nullable=True)
     tags = Column(String, nullable=True)

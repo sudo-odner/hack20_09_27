@@ -185,4 +185,7 @@ async def update_video(video_path_dir, video_path, timestamps, subtitles):
     await cut_video_by_timestamps(f"{video_path_dir}/{video_path}", timestamps, f"{video_path_dir}/out.mp4", subtitles)
 
     os.remove(f"{video_path_dir}/{video_path}")
-    os.rename(f"{video_path_dir}/out.mp4", video_path)
+    os.rename(f"{video_path_dir}/out.mp4", f"{video_path_dir}/{video_path}")
+
+# asyncio.run(cut_video_by_timestamps("storage/1/Google — 25 Years in Search_ The Most Searched.mp4",
+#             [{"start": 10000.0, "end": 20000.0}], "storage/1/clips/2.mp4", []))

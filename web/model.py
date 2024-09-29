@@ -2,7 +2,7 @@ import asyncio
 import aiohttp
 
 
-URL = "http://79.174.95.166/"
+URL = "http://79.174.95.166/ml/"
 
 
 async def get_token(video_path):
@@ -43,3 +43,13 @@ async def get_fragments(token_model):
                 return []
 
             return data["data"]
+
+
+async def get_info_fragments(subtitles):
+    async with aiohttp.ClientSession() as session:
+        async with session.get(URL + "info_fragments", data=subtitles) as response:
+            data = await response.json()
+            if not data["status"]:
+                return {}
+
+            return data
