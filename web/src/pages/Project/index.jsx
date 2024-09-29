@@ -10,6 +10,10 @@ import { SwishSpinner } from "react-spinners-kit";
 import VideoEditor from "../../components/VideoEditor";
 import JSZip from "jszip";
 
+function capitalizeFirstLetter(string) {
+    return string.charAt(0).toUpperCase() + string.slice(1);
+}
+
 function Project() {
   // const [searchProp, setSearchProp] = useState("");
   const to = useNavigate();
@@ -32,30 +36,31 @@ function Project() {
   const on_save = async (metadata) => {
     const update_clip = async () => {
       console.log(metadata);
-      const formData = new FormData();
-      formData.append("adhd", metadata.adhd);
-        formData.append("subtitle", true);
-    //   formData.append("subtitles", subtitles);
+      let d = JSON.stringify({"subtitles": JSON.stringify(subtitles), "adhd": Number(metadata.adhd), "subtitle": 1})
+      console.log(d)
       try {
         const response = await fetch(
           `http://localhost:8000/api/update_clip/${chosenClip}`,
           {
-            method: "PATCH",
-            body: formData,
+            method: "POST",
+            body: d,
+       
+
           }
         );
-
+        console.log(response.body)
         if (response.ok) {
           console.log("Success:", response.status);
-          let text = await response.text();
+          let text = response.text;
 
           const data = JSON.parse(text);
-          console.log();
+          console.log(data);
 
     //   formData.append("start", metadata.trim_times["start"]);
     //   formData.append("end", metadata.trim_times["end"]);
     //   formData.append("resolution", metadata.resolution);
     //   formData.append("extension", "mp4");
+
           window.open(
             `http://localhost:8000/api/export_clip/${chosenClip}?resolution=${metadata.resolution}&extension=mp4&start=${metadata.trim_times["start"]}&end=${metadata.trim_times["end"]}`,
             "_blank",
