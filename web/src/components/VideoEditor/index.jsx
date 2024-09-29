@@ -17,8 +17,8 @@ class VideoEditor extends React.Component {
             start: props.start,
             end: props.start,
             setStart: props.setStart,
-            setEnd: props.setEnd
-            
+            setEnd: props.setEnd,
+            onSave: props.onSave
         }
     }
 
@@ -51,7 +51,8 @@ class VideoEditor extends React.Component {
 
     saveVideo = (metadata) => {
         console.log(metadata)
-        alert("Please check your console to see all the metadata. This can be used for video post-processing.")
+        this.state.onSave(metadata)
+        // alert("Please check your console to see all the metadata. This can be used for video post-processing.")
     }
 
     render_editor = () => {
@@ -59,7 +60,7 @@ class VideoEditor extends React.Component {
             // Props:
             // videoUrl --> URL of uploaded video
             // saveVideo(<metadata of edited video>) --> gives the cut times and if video is muted or not
-            <Editor videoUrl={this.state.videoUrl} saveVideo={this.saveVideo}
+            <Editor videoUrl={this.state.videoUrl} onSave={this.saveVideo} saveVideo={this.saveVideo}
                     timings={this.state.timings} 
                     updateState={(st,cb) => this.setState(st, cb)}/>
         )
