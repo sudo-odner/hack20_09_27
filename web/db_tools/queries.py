@@ -93,11 +93,12 @@ async def update_clip(clip_id, subtitles, subtitle, adhd):
         clip.subtitle = subtitle
         clip.adhd = adhd
         project_id = clip.project_id
+        duration = clip.duration
         start = clip.start
         end = clip.end
         await session.commit()
 
-    return project_id, start, end
+    return project_id, duration, start, end
 
 
 async def delete_clip(clip_id):

@@ -128,12 +128,16 @@ class App(FastAPI):
         return FileResponse(f"storage/{project_id}/clip.zip", media_type="application/zip")
 
     async def update_clip(self, clip_id: int, subtitles: Optional[str] = Body(None), subtitle: Optional[bool] = Body(None), adhd: Optional[bool] = Body(None)):
-        project_id, start, end = await queries.update_clip(clip_id, subtitles, subtitle, adhd)
+        project_id, duration, start, end = await queries.update_clip(clip_id, subtitles, subtitle, adhd)
 
         if subtitle is not True:
             subtitles = '[]'
         if adhd:
             await video_tools.video2adhd(f"storage/{project_id}/clips", f"{clip_id}.mp4", "static/subwayserf.mp4")
+        if start is None:
+            start = 0
+        if end is None:
+            end = duration
         await video_tools.update_video(f"storage/{project_id}/clips", f"{clip_id}.mp4", [{"startTime": start, "endTime": end}], json.loads(subtitles))
 
         return JSONResponse({"status": "ok"})
@@ -141,6 +145,7 @@ class App(FastAPI):
     async def export_clip(self, clip_id: int, resolution: str, start: str, end: str, extension: str):
         clip, project_id = await queries.get_clip(clip_id)
 
+        await video_tools.update_video(f"storage/{project_id}/clips", f"{clip_id}.mp4", [{"startTime": float(start), "endTime": float(end)}], json.loads(clip.subtitles))
         await video_tools.change_resolution_and_extension(f"storage/{clip.project_id}/clips/{clip.id}.mp4", resolution, extension, start, end)
 
         return FileResponse(f"storage/{clip.project_id}/clips/{clip.id}.{extension}")
