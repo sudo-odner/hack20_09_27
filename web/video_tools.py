@@ -38,7 +38,7 @@ async def get_duration(video_path):
 
 async def bytes2img(bytes):
     if bytes is None:
-        return ''.decode('utf-8')
+        return b''.decode('utf-8')
     return base64.b64encode(bytes).decode('utf-8')
 
 
