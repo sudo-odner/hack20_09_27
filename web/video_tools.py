@@ -120,14 +120,19 @@ async def cut_video_by_timestamps(video_path, timestamps, out_video_path, subtit
     input_container = av.open(video_path)
     output_container = av.open(out_video_path, mode='w')
 
-    in_stream = input_container.streams.video[0]
+    in_video_stream = input_container.streams.video[0]
+    codec_name = in_video_stream.codec_context.name
+    fps = in_video_stream.codec_context.rate
+    out_video_stream = output_container.add_stream(codec_name, str(fps))
+    out_video_stream.width = in_video_stream.codec_context.width
+    out_video_stream.height = in_video_stream.codec_context.height
+    out_video_stream.pix_fmt = in_video_stream.codec_context.pix_fmt
 
-    codec_name = in_stream.codec_context.name
-    fps = in_stream.codec_context.rate
-    out_stream = output_container.add_stream(codec_name, str(fps))
-    out_stream.width = in_stream.codec_context.width
-    out_stream.height = in_stream.codec_context.height
-    out_stream.pix_fmt = in_stream.codec_context.pix_fmt
+    in_audio_stream = input_container.streams.audio[0] if input_container.streams.audio else None
+    out_audio_stream = None
+    if in_audio_stream:
+        out_audio_stream = output_container.add_stream(
+            in_audio_stream.codec.name, in_audio_stream.codec_context.sample_rate)
 
     i = 0
     for timestamp in timestamps:
@@ -135,31 +140,45 @@ async def cut_video_by_timestamps(video_path, timestamps, out_video_path, subtit
 
         input_container.seek(int(start_time / 1000 * av.time_base))
 
-        for frame in input_container.decode(in_stream):
+        for frame in input_container.decode(in_video_stream):
             if frame.time * 1000 > end_time:
-                continue
+                break
 
             while i < len(subtitles) and frame.time * 1000 > subtitles[i]['endTime']:
                 i += 1
+
             frame_pil = frame.to_image()
             if i < len(subtitles) and subtitles[i]['startTime'] <= frame.time * 1000 <= subtitles[i]['endTime']:
                 draw = ImageDraw.Draw(frame_pil)
                 text_size = draw.textlength(subtitles[i]['text'], font=font)
 
-                width = out_stream.width
-                height = out_stream.height
+                width = out_video_stream.width
+                height = out_video_stream.height
                 text_x = (width // 2) - (text_size // 2)
                 text_y = height - 100
 
-                draw.text((text_x, text_y),
-                          subtitles[i]['text'], font=font, fill=(255, 255, 255), stroke_width=3, stroke_fill=(0, 0, 0))
+                draw.text((text_x, text_y), subtitles[i]['text'], font=font, fill=(
+                    255, 255, 255), stroke_width=3, stroke_fill=(0, 0, 0))
 
             out_frame = av.VideoFrame.from_image(frame_pil)
-            out_packet = out_stream.encode(out_frame)
+            out_packet = out_video_stream.encode(out_frame)
             output_container.mux(out_packet)
 
-    out_packet = out_stream.encode(None)
-    output_container.mux(out_packet)
+        if in_audio_stream:
+            input_container.seek(int(start_time / 1000 * av.time_base))
+            for packet in input_container.decode(in_audio_stream):
+                if packet.time * 1000 > end_time:
+                    break
+                if packet.time * 1000 >= start_time:
+                    out_audio_packet = out_audio_stream.encode(packet)
+                    output_container.mux(out_audio_packet)
+
+    out_video_packet = out_video_stream.encode(None)
+    output_container.mux(out_video_packet)
+
+    if out_audio_stream:
+        out_audio_packet = out_audio_stream.encode(None)
+        output_container.mux(out_audio_packet)
 
     input_container.close()
     output_container.close()

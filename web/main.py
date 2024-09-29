@@ -26,7 +26,7 @@ class App(FastAPI):
         self.add_api_route(
             "/api/get_clip/{clip_id}", self.get_clip, methods=["GET"])
         self.add_api_route(
-            "/api/update_clip/{clip_id}", self.update_clip, methods=["PATCH"])
+            "/api/update_clip/{clip_id}", self.update_clip, methods=["POST"])
         self.add_api_route(
             "/api/export_clip/{clip_id}", self.export_clip, methods=["GET"])
         self.add_api_route(
