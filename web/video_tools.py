@@ -46,45 +46,6 @@ async def change_resolution_and_extension(video_path, new_resolution, new_extens
     ...
 
 
-# async def video2adhd(main_video_dir, main_video, adhd_video):
-#     top_cap = cv2.VideoCapture(f"{main_video_dir}/{main_video}")
-#     bottom_cap = cv2.VideoCapture(adhd_video)
-
-#     top_width = int(top_cap.get(cv2.CAP_PROP_FRAME_WIDTH))
-#     top_height = int(top_cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
-
-#     fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-#     out = cv2.VideoWriter(f"{main_video_dir}/out.mp4", fourcc, top_cap.get(
-#         cv2.CAP_PROP_FPS), (top_width, top_height))
-
-#     while top_cap.isOpened():
-#         ret_top, top_frame = top_cap.read()
-#         ret_bottom, bottom_frame = bottom_cap.read()
-
-#         if ret_top and ret_bottom:
-#             dim = (top_width, top_height // 2)
-#             top_frame = cv2.resize(top_frame, dim)
-#             bottom_frame = cv2.resize(
-#                 bottom_frame, dim, interpolation=cv2.INTER_AREA)
-
-#             combined_frame = np.zeros(
-#                 (top_height, top_width, 3), dtype=np.uint8)
-
-#             combined_frame[0:top_height // 2, 0:top_width] = top_frame
-#             combined_frame[top_height // 2:, 0:top_width] = bottom_frame
-
-#             out.write(combined_frame)
-#         else:
-#             break
-
-#     top_cap.release()
-#     bottom_cap.release()
-#     out.release()
-
-#     os.remove(f"{main_video_dir}/{main_video}")
-
-#     os.rename(f"{main_video_dir}/out.mp4", f"{main_video_dir}/{main_video}")
-
 async def video2adhd(main_video_dir, main_video, adhd_video):
     top_container = av.open(f"{main_video_dir}/{main_video}")
     bottom_container = av.open(adhd_video)
@@ -101,18 +62,56 @@ async def video2adhd(main_video_dir, main_video, adhd_video):
     out_stream.height = top_stream.codec_context.height
     out_stream.pix_fmt = top_stream.codec_context.pix_fmt
 
+    in_audio_stream = top_container.streams.audio[0] if top_container.streams.audio else None
+    out_audio_stream = None
+    if in_audio_stream:
+        out_audio_stream = output_container.add_stream(
+            in_audio_stream.codec.name, in_audio_stream.codec_context.sample_rate)
+
+    itr = iter(bottom_container.decode(bottom_stream))
+
     for frame in top_container.decode(top_stream):
-        frame_img = frame.to_image()
-        out_frame = av.VideoFrame.from_image(frame_img)
+        top_frame = frame.to_image()
+        bottom_frame = next(itr).to_image()
+
+        top_width, top_height = top_frame.size
+        target_height = top_height
+        target_width = top_width
+
+        top_frame = top_frame.resize(
+            (target_width, target_height // 2), Image.Resampling.LANCZOS)
+
+        bottom_frame = bottom_frame.resize(
+            (target_width, target_height // 2), Image.Resampling.LANCZOS)
+
+        combined_frame = Image.new("RGB", (target_width, target_height))
+
+        combined_frame.paste(top_frame, (0, 0))
+        combined_frame.paste(bottom_frame, (0, target_height // 2))
+
+        out_frame = av.VideoFrame.from_image(combined_frame)
         out_packet = out_stream.encode(out_frame)
         output_container.mux(out_packet)
+
+    if in_audio_stream:
+        top_container.seek(0)
+        for packet in top_container.decode(in_audio_stream):
+            out_audio_packet = out_audio_stream.encode(packet)
+            output_container.mux(out_audio_packet)
 
     out_packet = out_stream.encode(None)
     output_container.mux(out_packet)
 
+    if out_audio_stream:
+        out_audio_packet = out_audio_stream.encode(None)
+        output_container.mux(out_audio_packet)
+
     top_container.close()
     bottom_container.close()
     output_container.close()
+
+    os.remove(f"{main_video_dir}/{main_video}")
+    os.rename(f"{main_video_dir}/out.mp4", f"{main_video_dir}/{main_video}")
 
 
 async def cut_video_by_timestamps(video_path, timestamps, out_video_path, subtitles):
@@ -188,3 +187,6 @@ async def update_video(video_path_dir, video_path, timestamps, subtitles):
 
     os.remove(f"{video_path_dir}/{video_path}")
     os.rename(f"{video_path_dir}/out.mp4", video_path)
+
+asyncio.run(video2adhd("storage/1/", "Google — 25 Years in Search_ The Most Searched.mp4",
+            "static/62dc374694e04162bc3a3ea8.mp4"))

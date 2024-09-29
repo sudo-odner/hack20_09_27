@@ -127,9 +127,13 @@ class App(FastAPI):
 
         return FileResponse(f"storage/{project_id}/clip.zip", media_type="application/zip")
 
-    async def update_clip(self, clip_id: int, subtitles: Optional[str] = Body(None), subtitle: Optional[str] = Body(None), adhd: Optional[str] = Body(None)):
+    async def update_clip(self, clip_id: int, subtitles: Optional[str] = Body(None), subtitle: Optional[bool] = Body(None), adhd: Optional[bool] = Body(None)):
         project_id, start, end = await queries.update_clip(clip_id, subtitles, subtitle, adhd)
 
+        if subtitle is not True:
+            subtitles = '[]'
+        if adhd:
+            await video_tools.video2adhd(f"storage/{project_id}/clips", f"{clip_id}.mp4", "static/subwayserf.mp4")
         await video_tools.update_video(f"storage/{project_id}/clips", f"{clip_id}.mp4", [{"startTime": start, "endTime": end}], json.loads(subtitles))
 
         return JSONResponse({"status": "ok"})
