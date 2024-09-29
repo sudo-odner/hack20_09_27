@@ -2,7 +2,7 @@ import asyncio
 import aiohttp
 
 
-URL = "http://79.174.95.166/ml/"
+URL = "http://79.174.95.166/"
 
 
 async def get_token(video_path):
