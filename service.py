@@ -21,7 +21,7 @@ sa = SentimentAnalysis()
 
 
 # Определение POST маршрута для загрузки видео
-@app.post("/upload-video-mp4")
+@app.post("/ml/upload-video-mp4")
 async def upload_video_mp4(file: UploadFile):
     # Логируем начало загрузки видео
     print("Start video upload")
@@ -58,7 +58,7 @@ async def upload_video_mp4(file: UploadFile):
 
 
 # Определение GET маршрута для получения текста и атайм кодов видео по идентификатору
-@app.get("/video/{_id}/text")
+@app.get("/ml/video/{_id}/text")
 def get_text(_id: str):
     # Логируем начало процесса создания текста
     print("Start create text video")
@@ -71,7 +71,7 @@ def get_text(_id: str):
 
 
 # Определение POST маршрута для генерации заголовков и тегов для текста
-@app.post("/info_fragments")
+@app.post("/ml/info_fragments")
 def info_fragments(text: list[dict]):
     allText = ""
     for text in text:
@@ -89,7 +89,7 @@ def info_fragments(text: list[dict]):
 
 
 # Определение GET маршрута для получения фрагментов видео по идентификатору
-@app.get("/video/{_id}/fragments")
+@app.get("/ml/video/{_id}/fragments")
 def get_fragment(_id: str):
     startTime = time.time()
     # Логируем начало создания фрагментов видео
