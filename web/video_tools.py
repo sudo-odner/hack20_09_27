@@ -182,7 +182,7 @@ async def cut_video_by_timestamps(video_path, timestamps, out_video_path, subtit
 
 
 async def update_video(video_path_dir, video_path, timestamps, subtitles):
-    await cut_video_by_timestamps(f"{video_path_dir}/{video_path}", timestamps, "out.mp4", subtitles)
+    await cut_video_by_timestamps(f"{video_path_dir}/{video_path}", timestamps, f"{video_path_dir}/out.mp4", subtitles)
 
     os.remove(f"{video_path_dir}/{video_path}")
     os.rename(f"{video_path_dir}/out.mp4", video_path)
