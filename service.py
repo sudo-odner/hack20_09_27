@@ -66,12 +66,17 @@ def get_text(_id: str):
     # Возвращаем статус и данные текста
     return {"status": status, "data": wordData}
 
+
 # Определение POST маршрута для генерации заголовков и тегов для текста
 @app.post("/info_fragments")
-def info_fragments(text: str):
+def info_fragments(text: list[dict]):
+    allText = ""
+    for text in text:
+        allText = "".join(allText, text["text"])
+
     # Генерация заголовка и описания на основе текста
-    title, about = generate_text_data(text, num_keywords=1, num_sentences=3)
-    tags = generate_tags(text)
+    title, about = generate_text_data(allText, num_keywords=1, num_sentences=3)
+    tags = generate_tags(allText)
     # Возвращаем статус, теги, заголовок и описание
     return {"status": True, "tags": tags, "title": title, "about": about}
 
