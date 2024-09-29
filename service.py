@@ -10,7 +10,10 @@ from generate import generate_tags
 from generateNameAndDisc import generate_text_data
 
 # Создание экземпляра FastAPI
-app = FastAPI()
+app = FastAPI(
+    docs_url="/ml/docs",  # URL для документации Swagger
+    openapi_url="/ml/openapi.json",  # URL для спецификации OpenAPI
+)
 
 # Инициализация объектов для обработки речи и анализа тональности
 stt = STT("base")
