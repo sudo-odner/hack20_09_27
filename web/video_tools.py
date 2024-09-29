@@ -30,9 +30,7 @@ async def get_cover(video_path, timing=0):
 async def get_duration(video_path):
     input_container = av.open(video_path)
 
-    in_stream = input_container.streams.video[0]
-
-    duration = in_stream.duration * av.time_base
+    duration = input_container.duration / 1000
 
     input_container.close()
 
@@ -93,6 +91,29 @@ async def video2adhd(main_video_dir, main_video, adhd_video):
     bottom_container = av.open(adhd_video)
 
     output_container = av.open(f"{main_video_dir}/out.mp4", mode='w')
+
+    top_stream = top_container.streams.video[0]
+    bottom_stream = bottom_container.streams.video[0]
+
+    codec_name = top_stream.codec_context.name
+    fps = top_stream.codec_context.rate
+    out_stream = output_container.add_stream(codec_name, str(fps))
+    out_stream.width = top_stream.codec_context.width
+    out_stream.height = top_stream.codec_context.height
+    out_stream.pix_fmt = top_stream.codec_context.pix_fmt
+
+    for frame in top_container.decode(top_stream):
+        frame_img = frame.to_image()
+        out_frame = av.VideoFrame.from_image(frame_img)
+        out_packet = out_stream.encode(out_frame)
+        output_container.mux(out_packet)
+
+    out_packet = out_stream.encode(None)
+    output_container.mux(out_packet)
+
+    top_container.close()
+    bottom_container.close()
+    output_container.close()
 
 
 async def cut_video_by_timestamps(video_path, timestamps, out_video_path, subtitles):
