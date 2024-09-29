@@ -187,6 +187,3 @@ async def update_video(video_path_dir, video_path, timestamps, subtitles):
 
     os.remove(f"{video_path_dir}/{video_path}")
     os.rename(f"{video_path_dir}/out.mp4", video_path)
-
-asyncio.run(video2adhd("storage/1/", "Google — 25 Years in Search_ The Most Searched.mp4",
-            "static/62dc374694e04162bc3a3ea8.mp4"))
