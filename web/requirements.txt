@@ -10,3 +10,4 @@ python-multipart
 fastapi-utils
 opencv-python
 aiohttp
+av
