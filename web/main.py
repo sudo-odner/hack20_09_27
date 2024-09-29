@@ -125,15 +125,15 @@ class App(FastAPI):
 
         return FileResponse(f"storage/{project_id}/clip.zip", media_type="application/zip")
 
-    async def update_clip(self, clip_id: int, subtitle: bool, adhd: bool):
-        await queries.update_clip(clip_id, subtitle, adhd)
+    async def update_clip(self, clip_id: int, subtitles: str, subtitle: bool, adhd: bool):
+        await queries.update_clip(clip_id, subtitles, subtitle, adhd)
 
         return JSONResponse({"status": "ok"})
 
     async def export_clip(self, clip_id: int, resolution: str, start: str, end: str, extension: str):
         clip, project_id = await queries.get_clip(clip_id)
 
-        await video_tools.change_resolution_and_extension(f"storage/{clip.project_id}/clips/{clip.id}.mp4", resolution, extension)
+        await video_tools.change_resolution_and_extension(f"storage/{clip.project_id}/clips/{clip.id}.mp4", resolution, extension, start, end)
 
         return FileResponse(f"storage/{clip.project_id}/clips/{clip.id}.{extension}")
 

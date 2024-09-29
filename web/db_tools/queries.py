@@ -84,11 +84,12 @@ async def get_clip(clip_id):
     return clip
 
 
-async def update_clip(clip_id, subtitle, adhd):
+async def update_clip(clip_id, subtitles, subtitle, adhd):
     async with async_session() as session:
         q = select(Clip).where(Clip.id == clip_id)
         result = await session.execute(q)
         clip = result.scalar()
+        clip.subtitles = subtitles
         clip.subtitle = subtitle
         clip.adhd = adhd
         await session.commit()
