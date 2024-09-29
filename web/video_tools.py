@@ -136,7 +136,8 @@ async def cut_video_by_timestamps(video_path, timestamps, out_video_path, subtit
     for timestamp in timestamps:
         start_time, end_time = timestamp.values()
 
-        input_container.seek(int(start_time / 1000 * av.time_base))
+        input_container.seek(
+            int(start_time / 1000 * av.time_base), any_frame=True)
 
         for frame in input_container.decode(in_video_stream):
             if frame.time * 1000 > end_time:
@@ -163,7 +164,8 @@ async def cut_video_by_timestamps(video_path, timestamps, out_video_path, subtit
             output_container.mux(out_packet)
 
         if in_audio_stream:
-            input_container.seek(int(start_time / 1000 * av.time_base))
+            input_container.seek(
+                int(start_time / 1000 * av.time_base), any_frame=True)
             for packet in input_container.decode(in_audio_stream):
                 if packet.time * 1000 > end_time:
                     break

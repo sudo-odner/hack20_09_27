@@ -182,4 +182,4 @@ if __name__ == "__main__":
         host = "app_web"
     else:
         host = 'localhost'
-    uvicorn.run(app, host=host, port=8000)
+    uvicorn.run(app, host=host, port=8000, timeout_keep_alive=600)
