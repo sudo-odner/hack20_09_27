@@ -123,50 +123,51 @@ class Editor extends React.Component {
     );
   };
 
-  captureSnapshot = () => {
-    var video = this.playVideo.current;
-    const canvas = document.createElement("canvas");
-    // scale the canvas accordingly
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
-    // draw the video at that frame
-    canvas.getContext("2d").drawImage(video, 0, 0, canvas.width, canvas.height);
-    // convert it to a usable data URL
-    const dataURL = canvas.toDataURL();
-    this.setState({ imageUrl: dataURL });
-  };
+//   captureSnapshot = () => {
+//     var video = this.playVideo.current;
+//     const canvas = document.createElement("canvas");
+//     // scale the canvas accordingly
+//     canvas.width = video.videoWidth;
+//     canvas.height = video.videoHeight;
+//     // draw the video at that frame
+//     canvas.getContext("2d").drawImage(video, 0, 0, canvas.width, canvas.height);
+//     // convert it to a usable data URL
+//     const dataURL = canvas.toDataURL();
+//     this.setState({ imageUrl: dataURL });
+//   };
 
-  downloadSnapshot = () => {
-    var a = document.createElement("a"); //Create <a>
-    a.href = this.state.imageUrl; //Image Base64 Goes here
-    a.download = "Thumbnail.png"; //File name Here
-    a.click(); //Downloaded file
-  };
+//   downloadSnapshot = () => {
+//     var a = document.createElement("a"); //Create <a>
+//     a.href = this.state.imageUrl; //Image Base64 Goes here
+//     a.download = "Thumbnail.png"; //File name Here
+//     a.click(); //Downloaded file
+//   };
 
-  skipPrevious = () => {
-    if (this.state.playing) {
-      this.playVideo.current.pause();
-    }
-    var prev_idx =
-      this.state.currently_grabbed.index != 0
-        ? this.state.currently_grabbed.index - 1
-        : this.props.timings.length - 1;
-    this.setState(
-      { currently_grabbed: { index: prev_idx, type: "start" }, playing: false },
-      () => {
-        this.progressBar.current.style.left = `${
-          (this.props.timings[prev_idx].start /
-            this.playVideo.current.duration) *
-          100
-        }%`;
-        this.progressBar.current.style.width = "0%";
-        this.playVideo.current.currentTime = this.props.timings[prev_idx].start;
-      }
-    );
-  };
+//   skipPrevious = () => {
+//     if (this.state.playing) {
+//       this.playVideo.current.pause();
+//     }
+//     var prev_idx =
+//       this.state.currently_grabbed.index != 0
+//         ? this.state.currently_grabbed.index - 1
+//         : this.props.timings.length - 1;
+//     this.setState(
+//       { currently_grabbed: { index: prev_idx, type: "start" }, playing: false },
+//       () => {
+//         this.progressBar.current.style.left = `${
+//           (this.props.timings[prev_idx].start /
+//             this.playVideo.current.duration) *
+//           100
+//         }%`;
+//         this.progressBar.current.style.width = "0%";
+//         this.playVideo.current.currentTime = this.props.timings[prev_idx].start;
+//       }
+//     );
+//   };
 
   play_pause = () => {
     var self = this;
+    try{
     if (this.state.playing) {
       this.playVideo.current.pause();
     } else {
@@ -190,29 +191,29 @@ class Editor extends React.Component {
       this.playVideo.current.play();
     }
     this.setState({ playing: !this.state.playing });
-  };
+  } catch (error) {console.log(error)}};
 
-  skipNext = () => {
-    if (this.state.playing) {
-      this.playVideo.current.pause();
-    }
-    var next_idx =
-      this.state.currently_grabbed.index != this.props.timings.length - 1
-        ? this.state.currently_grabbed.index + 1
-        : 0;
-    this.setState(
-      { currently_grabbed: { index: next_idx, type: "start" }, playing: false },
-      () => {
-        this.progressBar.current.style.left = `${
-          (this.props.timings[next_idx].start /
-            this.playVideo.current.duration) *
-          100
-        }%`;
-        this.progressBar.current.style.width = "0%";
-        this.playVideo.current.currentTime = this.props.timings[next_idx].start;
-      }
-    );
-  };
+//   skipNext = () => {
+//     if (this.state.playing) {
+//       this.playVideo.current.pause();
+//     }
+//     var next_idx =
+//       this.state.currently_grabbed.index != this.props.timings.length - 1
+//         ? this.state.currently_grabbed.index + 1
+//         : 0;
+//     this.setState(
+//       { currently_grabbed: { index: next_idx, type: "start" }, playing: false },
+//       () => {
+//         this.progressBar.current.style.left = `${
+//           (this.props.timings[next_idx].start /
+//             this.playVideo.current.duration) *
+//           100
+//         }%`;
+//         this.progressBar.current.style.width = "0%";
+//         this.playVideo.current.currentTime = this.props.timings[next_idx].start;
+//       }
+//     );
+//   };
 
   updateProgress = (event) => {
     var playbackRect = this.playBackBar.current.getBoundingClientRect();
@@ -412,6 +413,7 @@ class Editor extends React.Component {
   };
 
   addActiveSegments = () => {
+    try{
     var colors = "";
     var counter = 0;
     colors += `, rgb(240, 240, 240) 0%, rgb(240, 240, 240) ${
@@ -436,7 +438,9 @@ class Editor extends React.Component {
       (this.props.timings[counter - 1].end / this.playVideo.current.duration) *
       100
     }%, rgb(240, 240, 240) 100%`;
-    this.playBackBar.current.style.background = `linear-gradient(to right${colors})`;
+    this.playBackBar.current.style.background = `linear-gradient(to right${colors})`;} catch(error) {
+        console.log(error)
+    }
   };
 
   saveVideo = () => {
@@ -446,8 +450,11 @@ class Editor extends React.Component {
       resolution: this.state.resolution,
       sdvg: this.state.sdvg
     };
-    // this.props.onSave(metadata)
-    alert(JSON.stringify(metadata));
+    console.log(metadata)
+    this.state.onSave(metadata)
+    
+    // alert(JSON.stringify(metadata));
+
   };
 
   render = () => {

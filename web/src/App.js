@@ -2,7 +2,7 @@ import './styles/App.scss';
 import React, {useEffect, useState} from 'react';
 import { useNavigate } from 'react-router';
 import {BrowserRouter, Route, Routes, useParams, useSearchParams } from 'react-router-dom';
-import Header from './components/Header';
+// import Header from './components/Header';
 
 import Home from './pages/Home';
 import site from './site';

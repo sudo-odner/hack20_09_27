@@ -3,6 +3,22 @@ import "./index.scss";
 import { useNavigate } from "react-router-dom";
 import server_url from "../../site";
 
+function TruncateString(text) {
+
+  if (text.length > 10) {
+    return (
+      <span>{text.substring(0, 10)}...</span>
+    );
+  } else {
+    return (
+      <span>{text}</span>
+    );
+  }
+}
+
+
+
+
 function Clip({ clip_id = 0, chooseClip, chosenClip, setLoad}) {
   const [clipData, setClipData] = useState({
     clip_id: "",
@@ -53,8 +69,8 @@ function Clip({ clip_id = 0, chooseClip, chosenClip, setLoad}) {
         />
       </div>
       <div className="clip-details">
-        <h3 className="clip-title">{clipData.title}</h3>
-        <p className="clip-date">{clipData.duration/1000} сек</p>
+        <h3 className="clip-title">{clipData.title ? TruncateString(clipData.title): ""}</h3>
+        {clipData.duration? <p className="clip-date">{Math.floor(clipData.duration/1000)} сек</p>:""}
       </div>
     </div>
   );
