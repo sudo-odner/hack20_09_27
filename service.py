@@ -10,10 +10,7 @@ from generate import generate_tags
 from generateNameAndDisc import generate_text_data
 
 # Создание экземпляра FastAPI
-app = FastAPI(
-    docs_url="/ml/docs",  # URL для документации Swagger
-    openapi_url="/ml/openapi.json",  # URL для спецификации OpenAPI
-)
+app = FastAPI()
 
 # Инициализация объектов для обработки речи и анализа тональности
 stt = STT("base")
@@ -140,4 +137,4 @@ def get_fragment(_id: str):
 
 # Запуск приложения FastAPI на указанном хосте и порте
 if __name__ == "__main__":
-    uvicorn.run(app, host="127.0.0.1", port=8000)
+    uvicorn.run(app, host="127.0.0.1", port=8000, timeout_keep_alive=)
