@@ -1,69 +1,62 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import server_url from "../../site";
-import SearchIcon from "../../icons/SearchIcon.svg";
-import Settings from "../../icons/Settings.svg";
-import Clear from "../../icons/Close.svg";
-import "./index.scss";
-import Clip from "../../components/Clip";
-import { SwishSpinner } from "react-spinners-kit";
-import VideoEditor from "../../components/VideoEditor";
-import JSZip from "jszip";
 
+import "./index.scss"; // Импортируем стили для компонента
+import Clip from "../../components/Clip"; // Импортируем компонент Clip
+import { SwishSpinner } from "react-spinners-kit"; // Импортируем компонент спиннера
+import VideoEditor from "../../components/VideoEditor"; // Импортируем компонент видеоредактора
+import JSZip from "jszip"; // Импортируем библиотеку JSZip для работы с zip-архивами
+
+// Функция для преобразования первой буквы строки в верхний регистр
 function capitalizeFirstLetter(string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
 function Project() {
-  // const [searchProp, setSearchProp] = useState("");
-  const to = useNavigate();
+  // const [searchProp, setSearchProp] = useState(""); // Комментарий удален, так как эта переменная не используется
 
-  const { project_id } = useParams();
-  const [activated, setActivated] = useState(-1);
-  const [data, setData] = useState("");
-  const [start, setStart] = useState(0);
-  const [end, setEnd] = useState(null);
-  const [clips, setClips] = useState([]);
-  const [subtitles, setSubtitles] = useState();
-  const [chosenClip, chooseClip] = useState(-1);
-  const [clip, setClip] = useState("");
-  const [load, setLoad] = useState(false);
+  const to = useNavigate(); // Сохраняем хук useNavigate для управления навигацией
+
+  const { project_id } = useParams(); // Извлекаем ID проекта из URL-параметра
+
+  // Состояния для хранения данных
+  const [activated, setActivated] = useState(-1); // Индекс выбранного клипа
+  const [data, setData] = useState(""); // Данные
+  const [start, setStart] = useState(0); // Начальное время клипа
+  const [end, setEnd] = useState(null); // Конечное время клипа
+  const [clips, setClips] = useState([]); // Массив клипов
+  const [subtitles, setSubtitles] = useState(); // Массив субтитров
+  const [chosenClip, chooseClip] = useState(-1); // Индекс выбранного клипа
+  const [clip, setClip] = useState(""); // Данные клипа
+  const [load, setLoad] = useState(false); // Флаг загрузки
 
   function home() {
-    to("/");
+    to("/"); // Переход на домашнюю страницу
   }
 
+  // Функция сохранения изменений
   const on_save = async (metadata) => {
     const update_clip = async () => {
-    //   console.log(metadata);
-      let d = JSON.stringify({"subtitles": JSON.stringify(subtitles), "adhd": metadata.sdvg, "subtitle": true})
-      console.log(d)
+      // console.log(metadata); // Удален неиспользуемый лог
+      let d = JSON.stringify({"subtitles": JSON.stringify(subtitles), "adhd": metadata.sdvg, "subtitle": true}) // Формируем JSON-данные для обновления
+      console.log(d) // Вывод данных в консоль
       try {
         const response = await fetch(
-          `http://localhost:8000/api/update_clip/${chosenClip}`,
+          "http://localhost:8000/api/update_clip/${chosenClip}", // Адрес API для обновления клипа
           {
             method: "POST",
-            body: d,
+            body: d, // Отправляем JSON-данные
             headers: {
               "Content-type": "application/json; charset=UTF-8"
             }
           }
         );
-        console.log(response.body)
+        console.log(response.body) // Вывод тела ответа в консоль
         if (response.ok) {
           console.log("Success:", response.status);
           let text = response.text;
-          
           const data = JSON.parse(text);
           console.log(data);
-          
-
-    //   formData.append("start", metadata.trim_times["start"]);
-    //   formData.append("end", metadata.trim_times["end"]);
-    //   formData.append("resolution", metadata.resolution);
-    //   formData.append("extension", "mp4");
-
-         
         } else {
           console.error(response.statusText);
         }
@@ -76,11 +69,11 @@ function Project() {
         "noopener,noreferrer"
       );
     };
-
-    console.log(15);
     update_clip();
   };
 
+
+  // Апдейт субтитров
   function updateSub(value, ind) {
     let data = subtitles;
     console.log(subtitles)
@@ -89,7 +82,8 @@ function Project() {
   }
 
   useEffect(() => {
-    const fetchUser = async () => {
+    // Фетч клипов их информации
+    const fetchClips = async () => {
       try {
         const response = await fetch(
           `http://localhost:8000/api/get_clips/${project_id}`,
@@ -115,8 +109,9 @@ function Project() {
       }
     };
 
-    fetchUser();
+    fetchClips();
 
+    // загрузка клипа(видео)
     const loadVideo = async () => {
       try {
         const response = await fetch(
@@ -144,9 +139,10 @@ function Project() {
             setSubtitles(details["subtitles"])
             setData({
               file: res,
-              title: "Название клипа",
+              title: details['title'],
               subtitles: details["subtitles"],
-              tags: "",
+              about: details['about'],
+              tags: details['tags'],
             });
             setLoad(false);
           });
@@ -164,6 +160,7 @@ function Project() {
       }
     };
 
+    // при тапе на клип загружаем
     if (chosenClip !== -1) {
       loadVideo();
     } else {
@@ -177,13 +174,14 @@ function Project() {
         <div className="backbutton">
           <div
             onClick={() => {
-              home();
+              home(); // кнопка назад
             }}
             className="backbutton-wrapper"
           >
             Все проекты
           </div>
         </div>
+        
         {/* <div className="search">
                     <div className="srchBrWrapper">
                         <img src={SearchIcon} alt="" />
@@ -210,6 +208,7 @@ function Project() {
                     </div>
                 </div> */}
         <div className="clips">
+            
           {clips.map((v) => (
             <Clip
               setLoad={setLoad}
@@ -244,7 +243,9 @@ function Project() {
           <div className="settings">
             <h1>{data.title}</h1>
             <h3>Описание:</h3>
-            <p className="clip-description">{data.meta}</p>
+            <p className="clip-description">{data.about}</p>
+            <h3>Тэги:</h3>
+            <p className="clip-description">{data.tags}</p>
             <div className="subtitles">
               {data.subtitles.map((v, i) => {
                 return activated !== i ? (

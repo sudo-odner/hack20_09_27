@@ -94,7 +94,7 @@ class App(FastAPI):
 
             subtitles_ = subtitles[s:l + 1]
 
-            fragment_info = await model.get_fragment_info(subtitles_)
+            fragment_info = await model.get_info_fragments(subtitles_)
             cover = await video_tools.get_cover(f"storage/{project_id}/{filename}", fragment["startTime"])
             clip_id = await queries.create_clip(project_id, fragment_info["title"], fragment["endTime"] - fragment["startTime"], cover, fragment_info["about"], fragment_info["tags"], json.dumps(subtitles_), fragment["startTime"], fragment["endTime"])
             await video_tools.cut_video_by_timestamps(f"storage/{project_id}/{filename}", [fragment], f"storage/{project_id}/clips/{clip_id}.mp4", subtitles_)
@@ -182,4 +182,4 @@ if __name__ == "__main__":
         host = "app_web"
     else:
         host = 'localhost'
-    uvicorn.run(app, host=host, port=8000, timeout_keep_alive=600)
+    uvicorn.run(app, host=host, port=8000)
