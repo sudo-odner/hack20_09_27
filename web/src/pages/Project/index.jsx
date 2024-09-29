@@ -36,7 +36,7 @@ function Project() {
   const on_save = async (metadata) => {
     const update_clip = async () => {
       console.log(metadata);
-      let d = JSON.stringify({"subtitles": JSON.stringify(subtitles), "adhd": Number(metadata.adhd), "subtitle": 1})
+      let d = JSON.stringify({"subtitles": JSON.stringify(subtitles), "adhd": metadata.sdvg, "subtitle": true})
       console.log(d)
       try {
         const response = await fetch(
