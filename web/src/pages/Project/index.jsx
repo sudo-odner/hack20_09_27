@@ -35,7 +35,7 @@ function Project() {
 
   const on_save = async (metadata) => {
     const update_clip = async () => {
-      console.log(metadata);
+    //   console.log(metadata);
       let d = JSON.stringify({"subtitles": JSON.stringify(subtitles), "adhd": metadata.sdvg, "subtitle": true})
       console.log(d)
       try {
@@ -44,6 +44,9 @@ function Project() {
           {
             method: "POST",
             body: d,
+            headers: {
+              "Content-type": "application/json; charset=UTF-8"
+            }
           }
         );
         console.log(response.body)
@@ -53,11 +56,7 @@ function Project() {
           
           const data = JSON.parse(text);
           console.log(data);
-          window.open(
-            `http://localhost:8000/api/export_clip/${chosenClip}?resolution=${metadata.resolution}&extension=mp4&start=${metadata.trim_times["start"]}&end=${metadata.trim_times["end"]}`,
-            "_blank",
-            "noopener,noreferrer"
-          );
+          
 
     //   formData.append("start", metadata.trim_times["start"]);
     //   formData.append("end", metadata.trim_times["end"]);
@@ -71,6 +70,11 @@ function Project() {
       } catch (error) {
         console.error("Error while updating clip", error);
       }
+      window.open(
+        `http://localhost:8000/api/export_clip/${chosenClip}?resolution=${metadata.resolution}&extension=mp4&start=${metadata.trim_times["start"]}&end=${metadata.trim_times["end"]}`,
+        "_blank",
+        "noopener,noreferrer"
+      );
     };
 
     console.log(15);
