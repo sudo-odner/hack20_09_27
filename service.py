@@ -82,7 +82,7 @@ def info_fragments(text: list[dict]):
     title, about = generate_text_data(allText, num_keywords=1, num_sentences=3)
     tags = generate_tags(allText)
     # Возвращаем статус, теги, заголовок и описание
-    return {"status": True, "tags": tags, "title": title, "about": about}
+    return {"status": True, "tags": ' '.join(tags), "title": title, "about": about}
 
 
 # Определение GET маршрута для получения фрагментов видео по идентификатору
