@@ -5,7 +5,6 @@ import io
 
 import asyncio
 import numpy as np
-import cv2
 from PIL import Image, ImageDraw, ImageFont
 
 font_path = "public/RUTUBE_Font/RF_RUTUBE_Bold.ttf"
@@ -182,3 +181,10 @@ async def cut_video_by_timestamps(video_path, timestamps, out_video_path, subtit
 
     input_container.close()
     output_container.close()
+
+
+async def update_video(video_path_dir, video_path, timestamps, subtitles):
+    await cut_video_by_timestamps(video_path, timestamps, "out.mp4", subtitles)
+
+    os.remove(f"{video_path_dir}/{video_path}")
+    os.rename(f"{video_path_dir}/out.mp4", video_path)

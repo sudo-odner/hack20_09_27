@@ -8,6 +8,5 @@ alembic
 psycopg2
 python-multipart
 fastapi-utils
-opencv-python
 aiohttp
 av

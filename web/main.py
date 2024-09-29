@@ -126,7 +126,9 @@ class App(FastAPI):
         return FileResponse(f"storage/{project_id}/clip.zip", media_type="application/zip")
 
     async def update_clip(self, clip_id: int, subtitles: str, subtitle: bool, adhd: bool):
-        await queries.update_clip(clip_id, subtitles, subtitle, adhd)
+        project_id, start, end = await queries.update_clip(clip_id, subtitles, subtitle, adhd)
+
+        await video_tools.update_video(f"storage/{project_id}/clips", f"{clip_id}.mp4", [{"startTime": start, "endTime": end}], json.loads(subtitles))
 
         return JSONResponse({"status": "ok"})
 
