@@ -24,7 +24,7 @@ function Project() {
   const [start, setStart] = useState(0);
   const [end, setEnd] = useState(null);
   const [clips, setClips] = useState([]);
-  const [subtitles, setSubtitles] = useState([]);
+  const [subtitles, setSubtitles] = useState();
   const [chosenClip, chooseClip] = useState(-1);
   const [clip, setClip] = useState("");
   const [load, setLoad] = useState(false);
@@ -44,28 +44,27 @@ function Project() {
           {
             method: "POST",
             body: d,
-       
-
           }
         );
         console.log(response.body)
         if (response.ok) {
           console.log("Success:", response.status);
           let text = response.text;
-
+          
           const data = JSON.parse(text);
           console.log(data);
+          window.open(
+            `http://localhost:8000/api/export_clip/${chosenClip}?resolution=${metadata.resolution}&extension=mp4&start=${metadata.trim_times["start"]}&end=${metadata.trim_times["end"]}`,
+            "_blank",
+            "noopener,noreferrer"
+          );
 
     //   formData.append("start", metadata.trim_times["start"]);
     //   formData.append("end", metadata.trim_times["end"]);
     //   formData.append("resolution", metadata.resolution);
     //   formData.append("extension", "mp4");
 
-          window.open(
-            `http://localhost:8000/api/export_clip/${chosenClip}?resolution=${metadata.resolution}&extension=mp4&start=${metadata.trim_times["start"]}&end=${metadata.trim_times["end"]}`,
-            "_blank",
-            "noopener,noreferrer"
-          );
+         
         } else {
           console.error(response.statusText);
         }
@@ -80,8 +79,8 @@ function Project() {
 
   function updateSub(value, ind) {
     let data = subtitles;
-    data[ind] = value;
-    console.log(data);
+    console.log(subtitles)
+    data[ind].text = value;
     setSubtitles(data);
   }
 
@@ -138,6 +137,7 @@ function Project() {
               await zipped.file("data.json").async("string")
             );
             console.log(zipped, details);
+            setSubtitles(details["subtitles"])
             setData({
               file: res,
               title: "Название клипа",

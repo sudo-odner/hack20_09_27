@@ -459,7 +459,8 @@ class Editor extends React.Component {
 
   render = () => {
     return (
-      <div className="wrapper">
+      <div className="wrapper" style={{width: "324px"}}>
+        <div className="video-container" style={{background: "black", height: "576px",  display: "flex", flexDirection: "column", justifyContent: "space-around"}}>
         <video
           className="video"
           autoload="metadata"
@@ -468,7 +469,7 @@ class Editor extends React.Component {
           onClick={this.play_pause.bind(this)}
         >
           <source src={this.props.videoUrl} type="video/mp4" />
-        </video>
+        </video></div>
         <div className="playback">
           {this.renderGrabbers()}
           <div
