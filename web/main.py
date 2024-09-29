@@ -131,14 +131,11 @@ class App(FastAPI):
         return JSONResponse({"status": "ok"})
 
     async def export_clip(self, clip_id: int, resolution: str, start: str, end: str, extension: str):
-        clip = await queries.get_clip(clip_id)
+        clip, project_id = await queries.get_clip(clip_id)
 
         await video_tools.change_resolution_and_extension(f"storage/{clip.project_id}/clips/{clip.id}.mp4", resolution, extension)
 
-        with open(f"storage/{clip.project_id}/clips/{clip.id}.{extension}", "rb") as f:
-            video = f.read()
-
-        return JSONResponse({"video": video})
+        return FileResponse(f"storage/{clip.project_id}/clips/{clip.id}.{extension}")
 
     async def remove_clip(self, clip_id: int):
         await queries.remove_clip(clip_id)

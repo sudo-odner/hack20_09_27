@@ -1,6 +1,9 @@
 import os
 import base64
+import av
+import io
 
+import asyncio
 import numpy as np
 import cv2
 from PIL import Image, ImageDraw, ImageFont
@@ -10,25 +13,28 @@ font = ImageFont.truetype(font_path, 60)
 
 
 async def get_cover(video_path, timing=0):
-    cap = cv2.VideoCapture(video_path)
-    fps = cap.get(cv2.CAP_PROP_FPS)
+    input_container = av.open(video_path)
 
-    cap.set(cv2.CAP_PROP_POS_FRAMES, timing * fps // 1000)
-    _, frame = cap.read()
-    cap.release()
+    in_stream = input_container.streams.video[0]
 
-    _, buffer = cv2.imencode('.jpg', frame)
-    return buffer
+    input_container.seek(int(timing / 1000 * av.time_base))
+
+    for frame in input_container.decode(in_stream):
+        img = frame.to_image()
+        buffer = io.BytesIO()
+        img.save(buffer, format='JPEG')
+        input_container.close()
+        return buffer.getvalue()
 
 
 async def get_duration(video_path):
-    cap = cv2.VideoCapture(video_path)
+    input_container = av.open(video_path)
 
-    fps = cap.get(cv2.CAP_PROP_FPS)
-    total_frames = cap.get(cv2.CAP_PROP_FRAME_COUNT)
-    duration = total_frames / fps
+    in_stream = input_container.streams.video[0]
 
-    cap.release()
+    duration = in_stream.duration * av.time_base
+
+    input_container.close()
 
     return int(duration * 1000)
 
@@ -40,35 +46,7 @@ async def bytes2img(bytes):
 
 
 async def change_resolution_and_extension(video_path, new_resolution, new_extension):
-    r = int(new_resolution[:-1])
-    resoluion = (r, r * 16 // 9)
-
-    cap = cv2.VideoCapture(video_path)
-
-    width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
-    height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
-
-    if resoluion == (height, width):
-        return
-
-    fourcc = cv2.VideoWriter_fourcc(*new_extension.upper())
-
-    out_video_path = '.'.join(video_path.split('.')[:-1]) + '.' + new_extension
-    output_video = cv2.VideoWriter(
-        out_video_path, fourcc, cap.get(cv2.CAP_PROP_FPS), resoluion)
-
-    while (True):
-        ret, frame = cap.read()
-        if not ret:
-            break
-
-        resized_frame = cv2.resize(
-            frame, resoluion, interpolation=cv2.INTER_AREA)
-
-        output_video.write(resized_frame)
-
-    cap.release()
-    output_video.release()
+    ...
 
 
 async def video2adhd(main_video_dir, main_video, adhd_video):
@@ -112,46 +90,49 @@ async def video2adhd(main_video_dir, main_video, adhd_video):
 
 
 async def cut_video_by_timestamps(video_path, timestamps, out_video_path, subtitles):
-    cap = cv2.VideoCapture(video_path)
-    fps = cap.get(cv2.CAP_PROP_FPS)
+    input_container = av.open(video_path)
+    output_container = av.open(out_video_path, mode='w')
 
-    width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
-    height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+    in_stream = input_container.streams.video[0]
 
-    fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-    out = cv2.VideoWriter(out_video_path, fourcc, fps,
-                          (height, width))
+    codec_name = in_stream.codec_context.name
+    fps = in_stream.codec_context.rate
+    out_stream = output_container.add_stream(codec_name, str(fps))
+    out_stream.width = in_stream.codec_context.width
+    out_stream.height = in_stream.codec_context.height
+    out_stream.pix_fmt = in_stream.codec_context.pix_fmt
 
     i = 0
     for timestamp in timestamps:
         start_time, end_time = timestamp.values()
-        start_frame = int(start_time * fps / 1000)
-        end_frame = int(end_time * fps / 1000)
 
-        cap.set(cv2.CAP_PROP_POS_FRAMES, start_frame)
+        input_container.seek(int(start_time / 1000 * av.time_base))
 
-        frame_count = 0
-        while frame_count < (end_frame - start_frame):
-            ret, frame = cap.read()
-            if not ret:
-                break
-            while i < len(subtitles) and start_frame + frame_count > int(subtitles[i]['endTime'] * fps / 1000):
+        for frame in input_container.decode(in_stream):
+            if frame.time * 1000 > end_time:
+                continue
+
+            while i < len(subtitles) and frame.time * 1000 > subtitles[i]['endTime']:
                 i += 1
-            frame_pil = Image.fromarray(frame)
-            if i < len(subtitles) and int(subtitles[i]['startTime'] * fps / 1000) <= start_frame + frame_count <= int(subtitles[i]['endTime'] * fps / 1000):
+            frame_pil = frame.to_image()
+            if i < len(subtitles) and subtitles[i]['startTime'] <= frame.time * 1000 <= subtitles[i]['endTime']:
                 draw = ImageDraw.Draw(frame_pil)
                 text_size = draw.textlength(subtitles[i]['text'], font=font)
 
-                width = frame.shape[1]
-                height = frame.shape[0]
+                width = out_stream.width
+                height = out_stream.height
                 text_x = (width // 2) - (text_size // 2)
                 text_y = height - 100
 
                 draw.text((text_x, text_y),
                           subtitles[i]['text'], font=font, fill=(255, 255, 255), stroke_width=3, stroke_fill=(0, 0, 0))
 
-            out.write(np.array(frame_pil))
-            frame_count += 1
+            out_frame = av.VideoFrame.from_image(frame_pil)
+            out_packet = out_stream.encode(out_frame)
+            output_container.mux(out_packet)
 
-    out.release()
-    cap.release()
+    out_packet = out_stream.encode(None)
+    output_container.mux(out_packet)
+
+    input_container.close()
+    output_container.close()
