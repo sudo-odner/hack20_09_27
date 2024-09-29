@@ -167,9 +167,8 @@ async def cut_video_by_timestamps(video_path, timestamps, out_video_path, subtit
             for packet in input_container.decode(in_audio_stream):
                 if packet.time * 1000 > end_time:
                     break
-                if packet.time * 1000 >= start_time:
-                    out_audio_packet = out_audio_stream.encode(packet)
-                    output_container.mux(out_audio_packet)
+                out_audio_packet = out_audio_stream.encode(packet)
+                output_container.mux(out_audio_packet)
 
     out_video_packet = out_video_stream.encode(None)
     output_container.mux(out_video_packet)
@@ -183,7 +182,7 @@ async def cut_video_by_timestamps(video_path, timestamps, out_video_path, subtit
 
 
 async def update_video(video_path_dir, video_path, timestamps, subtitles):
-    await cut_video_by_timestamps(video_path, timestamps, "out.mp4", subtitles)
+    await cut_video_by_timestamps(f"{video_path_dir}/{video_path}", timestamps, "out.mp4", subtitles)
 
     os.remove(f"{video_path_dir}/{video_path}")
     os.rename(f"{video_path_dir}/out.mp4", video_path)
