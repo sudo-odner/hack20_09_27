@@ -34,6 +34,8 @@ async def get_duration(video_path):
 
 
 async def bytes2img(bytes):
+    if bytes is None:
+        return ''.decode('utf-8')
     return base64.b64encode(bytes).decode('utf-8')
 
 
@@ -118,7 +120,7 @@ async def cut_video_by_timestamps(video_path, timestamps, out_video_path, subtit
 
     fourcc = cv2.VideoWriter_fourcc(*'mp4v')
     out = cv2.VideoWriter(out_video_path, fourcc, fps,
-                          (int(cap.get(3)), int(cap.get(4))))
+                          (height, width))
 
     i = 0
     for timestamp in timestamps:
