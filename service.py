@@ -72,7 +72,11 @@ def get_text(_id: str):
 def info_fragments(text: list[dict]):
     allText = ""
     for text in text:
-        allText = "".join(allText, text["text"])
+        text = text.get("text")
+        if type(text) == "str":
+            allText = "".join(allText, text)
+        else:
+            print("text in dict has error")
 
     # Генерация заголовка и описания на основе текста
     title, about = generate_text_data(allText, num_keywords=1, num_sentences=3)
@@ -115,7 +119,8 @@ def get_fragment(_id: str):
     # Объединяем данные и получаем лучшие таймкоды для фрагментов
     timeMerge = time.time()
     print("Start merge data")
-    fragment = get_timecodes(dataText, dataVideo, dataAudio, aud_c=1, compl_c=0.5, k=1, points_between_peaks=800, epsilon_to_cut=500)
+    fragment = get_timecodes(dataText, dataVideo, dataAudio, aud_c=1, compl_c=0.5, k=1, points_between_peaks=800,
+                             epsilon_to_cut=500)
     # Формируем список ответов с началом и концом каждого фрагмента
     answer_dict = list()
     for data in fragment:
