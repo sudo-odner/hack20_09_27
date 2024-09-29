@@ -137,4 +137,4 @@ def get_fragment(_id: str):
 
 # Запуск приложения FastAPI на указанном хосте и порте
 if __name__ == "__main__":
-    uvicorn.run(app, host="127.0.0.1", port=8000, timeout_keep_alive=)
+    uvicorn.run(app, host="127.0.0.1", port=8000)
